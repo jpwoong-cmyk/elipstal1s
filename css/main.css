@@ -168,39 +168,119 @@ body {
 }
 
 
-/* Menu selection line */
+/* ================================
+   MENU ARROW OUTER SHAPE
+================================ */
 
 .menu-button::before {
     content: "";
 
     position: absolute;
 
-    left: -28px;
+    left: -48px;
     top: 50%;
 
-    width: 0;
-    height: 1px;
+    width: 34px;
+    height: 26px;
 
-    background: currentColor;
+    background: #111;
 
-    transform: translateY(-50%);
+    clip-path: polygon(
+        0 50%,
+        42% 0,
+        100% 50%,
+        42% 100%
+    );
+
+    transform:
+        translateY(-50%)
+        translateX(-8px)
+        scale(0.82);
+
+    opacity: 0;
 
     transition:
-        width 160ms ease;
+        opacity 180ms ease,
+        transform 180ms ease;
 }
 
 
+/* ================================
+   MENU ARROW INNER SILVER
+================================ */
+
+.menu-button::after {
+    content: "";
+
+    position: absolute;
+
+    left: -44px;
+    top: 50%;
+
+    width: 27px;
+    height: 19px;
+
+    background:
+        linear-gradient(
+            to bottom,
+            #d9dfe2 0%,
+            #bdc5c9 46%,
+            #858d92 47%,
+            #545b60 100%
+        );
+
+    clip-path: polygon(
+        0 50%,
+        40% 0,
+        100% 50%,
+        40% 100%
+    );
+
+    transform:
+        translateY(-50%)
+        translateX(-8px)
+        scale(0.82);
+
+    opacity: 0;
+
+    transition:
+        opacity 180ms ease,
+        transform 180ms ease;
+
+    filter:
+        drop-shadow(
+            0 0 2px
+            rgba(255, 255, 255, 0.22)
+        );
+}
+
+
+/* ================================
+   MENU HOVER / FOCUS / TAP
+================================ */
+
 .menu-button:hover,
-.menu-button:focus-visible {
+.menu-button:focus-visible,
+.menu-button:active {
     color: #fff;
 
-    transform: translateX(8px);
+    transform:
+        translateX(10px);
 }
 
 
 .menu-button:hover::before,
-.menu-button:focus-visible::before {
-    width: 18px;
+.menu-button:focus-visible::before,
+.menu-button:active::before,
+.menu-button:hover::after,
+.menu-button:focus-visible::after,
+.menu-button:active::after {
+    opacity: 1;
+
+    transform:
+        translateY(-50%)
+        translateX(0)
+        scale(1);
 }
 
 
@@ -303,7 +383,7 @@ body {
 
 
     .main-menu {
-        padding-top: 32px;
+        padding-top: 55px;
 
         padding-left: 24px;
         padding-right: 20px;
@@ -327,11 +407,33 @@ body {
         margin-top: 28px;
 
         gap: 22px;
+
+        padding-left: 38px;
     }
 
 
     .menu-button {
         font-size: 21px;
+    }
+
+
+    /*
+       Slightly smaller arrow on mobile
+    */
+
+    .menu-button::before {
+        left: -39px;
+
+        width: 29px;
+        height: 23px;
+    }
+
+
+    .menu-button::after {
+        left: -35px;
+
+        width: 22px;
+        height: 16px;
     }
 
 
@@ -372,11 +474,29 @@ body {
 
     .menu-options {
         margin-top: 22px;
+
+        padding-left: 36px;
     }
 
 
     .menu-button {
         font-size: 19px;
+    }
+
+
+    .menu-button::before {
+        left: -37px;
+
+        width: 27px;
+        height: 21px;
+    }
+
+
+    .menu-button::after {
+        left: -33px;
+
+        width: 20px;
+        height: 15px;
     }
 
 
@@ -397,7 +517,8 @@ body {
 @media (prefers-reduced-motion: reduce) {
 
     .menu-button,
-    .menu-button::before {
+    .menu-button::before,
+    .menu-button::after {
         transition: none;
     }
 
