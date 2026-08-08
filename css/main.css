@@ -196,6 +196,35 @@ body {
     user-select: none;
 }
 
+/* ================================
+   MAIN SCREEN PARTICLE LAYER
+================================ */
+
+.main-screen-sparks {
+    position: absolute;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    z-index: 0;
+
+    pointer-events: none;
+}
+
+
+/* Keep menu and artwork above particles */
+
+.main-menu {
+    position: relative;
+    z-index: 2;
+}
+
+.main-art {
+    z-index: 1;
+}
+
 
 /* ================================
    TABLET

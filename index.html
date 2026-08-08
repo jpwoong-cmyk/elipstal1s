@@ -7,48 +7,54 @@
     <title>Ecliptalis</title>
 
     <link rel="stylesheet" href="css/main.css">
+    <script src="js/mainscreen_animation.js" defer></script>
 </head>
 
 <body>
 
     <main class="main-screen">
 
-        <!-- LEFT CONTENT -->
-        <section class="main-menu">
+    <!-- Falling shadow sparks -->
+    <canvas
+        id="mainScreenSparks"
+        class="main-screen-sparks"
+        aria-hidden="true">
+    </canvas>
 
-            <h1 class="game-title">
-                ECLIPTALIS
-            </h1>
+    <!-- LEFT CONTENT -->
+    <section class="main-menu">
 
-            <nav class="menu-options" aria-label="Main menu">
+        <h1 class="game-title">
+            ECLIPTALIS
+        </h1>
 
-                <button class="menu-button" type="button">
-                    New Game
-                </button>
+        <nav class="menu-options" aria-label="Main menu">
 
-                <button class="menu-button" type="button">
-                    Continue
-                </button>
+            <button class="menu-button" type="button">
+                New Game
+            </button>
 
-                <button class="menu-button" type="button">
-                    Settings
-                </button>
+            <button class="menu-button" type="button">
+                Continue
+            </button>
 
-            </nav>
+            <button class="menu-button" type="button">
+                Settings
+            </button>
 
-        </section>
+        </nav>
 
+    </section>
 
-        <!-- MAIN CHARACTER / ARTWORK -->
-        <div class="main-art">
-            <img
-                src="assets/mainscreen_pic.png"
-                alt=""
-                draggable="false"
-            >
-        </div>
+    <!-- MAIN CHARACTER -->
+    <div class="main-art">
+        <img
+            src="assets/mainscreen_pic.png"
+            alt=""
+            draggable="false"
+        >
+    </div>
 
-    </main>
+</main>
 
-</body>
-</html>
+<script src="js/mainscreen_animation.js"></script>
