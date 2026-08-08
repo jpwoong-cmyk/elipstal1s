@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Ecliptalis</title>
 
     <link rel="stylesheet" href="css/main.css">
@@ -12,49 +11,36 @@
 
 <body>
 
-    <main class="main-screen">
+<main class="main-screen">
 
-    <!-- Falling shadow sparks -->
     <canvas
         id="mainScreenSparks"
         class="main-screen-sparks"
         aria-hidden="true">
     </canvas>
 
-    <!-- LEFT CONTENT -->
     <section class="main-menu">
-
-        <h1 class="game-title">
-            ECLIPTALIS
-        </h1>
+        <h1 class="game-title">ECLIPTALIS</h1>
 
         <nav class="menu-options" aria-label="Main menu">
-
-            <button class="menu-button" type="button">
-                New Game
-            </button>
-
-            <button class="menu-button" type="button">
-                Continue
-            </button>
-
-            <button class="menu-button" type="button">
-                Settings
-            </button>
-
+            <button class="menu-button" type="button">New Game</button>
+            <button class="menu-button" type="button">Continue</button>
+            <button class="menu-button" type="button">Settings</button>
         </nav>
-
     </section>
 
-    <!-- MAIN CHARACTER -->
     <div class="main-art">
         <img
             src="assets/mainscreen_pic.png"
             alt=""
             draggable="false"
         >
+
+        <span class="eye-glow eye-left" aria-hidden="true"></span>
+        <span class="eye-glow eye-right" aria-hidden="true"></span>
     </div>
 
 </main>
 
-<script src="js/mainscreen_animation.js"></script>
+</body>
+</html>
