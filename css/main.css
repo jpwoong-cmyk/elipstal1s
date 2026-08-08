@@ -77,13 +77,13 @@ body {
 
     padding-top: clamp(
         55px,
-        8vh,
+        19vh,
         100px
     );
 
     padding-left: clamp(
         70px,
-        7.5vw,
+        10vw,
         125px
     );
 }
@@ -97,12 +97,12 @@ body {
     display: block;
 
     width: clamp(
-        520px,
-        48vw,
-        820px
+        560px,
+        52vw,
+        880px
     );
 
-    height: 155px;
+    height: 175px;
 
     object-fit: cover;
     object-position: center 50%;
