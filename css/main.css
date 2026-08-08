@@ -77,7 +77,7 @@ body {
 
     padding-top: clamp(
         55px,
-        19vh,
+        25vh,
         100px
     );
 
