@@ -28,21 +28,22 @@ body {
 }
 
 
-
 /* ================================
    MAIN SCREEN
 ================================ */
 
-.main-menu {
+.main-screen {
     position: relative;
-    z-index: 2;
 
-    height: 100%;
+    width: 100vw;
+    height: 100svh;
 
-    padding-top: clamp(55px, 8vh, 100px);
-    padding-left: clamp(45px, 7.5vw, 125px);
+    min-height: 520px;
+
+    overflow: hidden;
+
+    background: #000;
 }
-
 
 
 /* ================================
@@ -63,7 +64,6 @@ body {
 }
 
 
-
 /* ================================
    LEFT MENU AREA
 ================================ */
@@ -76,18 +76,17 @@ body {
     height: 100%;
 
     padding-top: clamp(
-        45px,
-        6vh,
-        80px
+        55px,
+        8vh,
+        100px
     );
 
     padding-left: clamp(
-        45px,
-        6vw,
-        100px
+        70px,
+        7.5vw,
+        125px
     );
 }
-
 
 
 /* ================================
@@ -97,16 +96,20 @@ body {
 .game-title-logo {
     display: block;
 
-    width: clamp(430px, 46vw, 760px);
-    height: clamp(100px, 12vh, 145px);
+    width: clamp(
+        520px,
+        48vw,
+        820px
+    );
 
-    object-fit: contain;
-    object-position: left center;
+    height: 155px;
+
+    object-fit: cover;
+    object-position: center 50%;
 
     user-select: none;
     pointer-events: none;
 }
-
 
 
 /* ================================
@@ -115,14 +118,23 @@ body {
 
 .menu-options {
     display: flex;
+
     flex-direction: column;
+
     align-items: flex-start;
 
-    gap: clamp(22px, 3vh, 34px);
+    gap: clamp(
+        22px,
+        3vh,
+        34px
+    );
 
-    margin-top: clamp(70px, 10vh, 105px);
+    margin-top: clamp(
+        45px,
+        7vh,
+        75px
+    );
 }
-
 
 
 .menu-button {
@@ -156,7 +168,6 @@ body {
 }
 
 
-
 /* Menu selection line */
 
 .menu-button::before {
@@ -179,15 +190,12 @@ body {
 }
 
 
-
 .menu-button:hover,
 .menu-button:focus-visible {
     color: #fff;
 
-    transform:
-        translateX(8px);
+    transform: translateX(8px);
 }
-
 
 
 .menu-button:hover::before,
@@ -196,11 +204,9 @@ body {
 }
 
 
-
 .menu-button:focus-visible {
     outline: none;
 }
-
 
 
 /* ================================
@@ -231,7 +237,6 @@ body {
 }
 
 
-
 .main-art img {
     display: block;
 
@@ -247,7 +252,6 @@ body {
 }
 
 
-
 /* ================================
    TABLET
 ================================ */
@@ -261,9 +265,16 @@ body {
 
     .game-title-logo {
         width: min(
-            52vw,
-            600px
+            58vw,
+            680px
         );
+
+        height: 140px;
+    }
+
+
+    .menu-options {
+        margin-top: 40px;
     }
 
 
@@ -275,7 +286,6 @@ body {
     }
 
 }
-
 
 
 /* ================================
@@ -299,14 +309,16 @@ body {
 
     .game-title-logo {
         width: min(
-            88vw,
-            520px
+            92vw,
+            560px
         );
+
+        height: 120px;
     }
 
 
     .menu-options {
-        margin-top: 45px;
+        margin-top: 28px;
 
         gap: 22px;
     }
@@ -331,7 +343,6 @@ body {
 }
 
 
-
 /* ================================
    SMALL MOBILE
 ================================ */
@@ -344,12 +355,13 @@ body {
 
 
     .game-title-logo {
-        width: 90vw;
+        width: 94vw;
+        height: 105px;
     }
 
 
     .menu-options {
-        margin-top: 35px;
+        margin-top: 22px;
     }
 
 
@@ -366,7 +378,6 @@ body {
     }
 
 }
-
 
 
 /* ================================
