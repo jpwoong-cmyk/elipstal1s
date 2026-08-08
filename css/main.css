@@ -33,17 +33,14 @@ body {
    MAIN SCREEN
 ================================ */
 
-.main-screen {
+.main-menu {
     position: relative;
+    z-index: 2;
 
-    width: 100vw;
-    height: 100svh;
+    height: 100%;
 
-    min-height: 520px;
-
-    overflow: hidden;
-
-    background: #000;
+    padding-top: clamp(55px, 8vh, 100px);
+    padding-left: clamp(45px, 7.5vw, 125px);
 }
 
 
@@ -100,20 +97,13 @@ body {
 .game-title-logo {
     display: block;
 
-    width: clamp(
-        390px,
-        43vw,
-        720px
-    );
-
-    height: auto;
+    width: clamp(430px, 46vw, 760px);
+    height: clamp(100px, 12vh, 145px);
 
     object-fit: contain;
-
     object-position: left center;
 
     user-select: none;
-
     pointer-events: none;
 }
 
@@ -125,22 +115,12 @@ body {
 
 .menu-options {
     display: flex;
-
     flex-direction: column;
-
     align-items: flex-start;
 
-    gap: clamp(
-        22px,
-        3vh,
-        34px
-    );
+    gap: clamp(22px, 3vh, 34px);
 
-    margin-top: clamp(
-        65px,
-        9vh,
-        100px
-    );
+    margin-top: clamp(70px, 10vh, 105px);
 }
 
 
