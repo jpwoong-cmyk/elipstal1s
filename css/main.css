@@ -122,35 +122,6 @@ body {
     user-select: none;
 }
 
-.eye-glow {
-    position: absolute;
-    width: 11px;
-    height: 7px;
-    border-radius: 50%;
-    background: #ff1818;
-    opacity: 0.72;
-    box-shadow:
-        0 0 4px rgba(255, 60, 60, 1),
-        0 0 10px rgba(255, 0, 0, 0.95),
-        0 0 20px rgba(255, 0, 0, 0.72),
-        0 0 34px rgba(255, 0, 0, 0.42);
-    filter: blur(0.2px);
-    animation: demonEyeFlare 6.5s ease-in-out infinite;
-}
-
-.eye-left {
-    left: 31.5%;
-    top: 17.6%;
-    transform: rotate(18deg);
-}
-
-.eye-right {
-    left: 36.7%;
-    top: 16.1%;
-    transform: rotate(-18deg);
-    animation-delay: 0.08s;
-}
-
 @keyframes demonEyeFlare {
     0%,
     68%,
@@ -257,8 +228,7 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
     .menu-button,
-    .menu-button::before,
-    .eye-glow {
+    .menu-button::before{
         transition: none;
         animation: none;
     }
