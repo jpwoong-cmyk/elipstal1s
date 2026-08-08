@@ -229,4 +229,366 @@
             createParticles();
         }
     );
+
+    /* ========================================
+   MAIN MENU
+======================================== */
+
+const menuContent =
+    document.getElementById("menuContent");
+
+
+if (menuContent) {
+
+    menuContent.addEventListener(
+        "click",
+        (event) => {
+
+            const actionButton =
+                event.target.closest(
+                    "[data-menu-action]"
+                );
+
+
+            if (actionButton) {
+
+                const action =
+                    actionButton.dataset.menuAction;
+
+
+                if (action === "establish") {
+                    showEstablishHold();
+                }
+
+
+                return;
+            }
+
+
+            if (
+                event.target.closest(
+                    "#sealHoldButton"
+                )
+            ) {
+                forgeSeal();
+
+                return;
+            }
+
+
+            if (
+                event.target.closest(
+                    "#holdReturnButton"
+                )
+            ) {
+                showMainMenu();
+            }
+
+        }
+    );
+
+}
+
+
+/* ========================================
+   MAIN MENU HTML
+======================================== */
+
+function showMainMenu() {
+
+    menuContent.innerHTML = `
+        <nav
+            class="menu-options"
+            aria-label="Main menu"
+        >
+
+            <button
+                class="menu-button"
+                type="button"
+                data-menu-action="establish"
+            >
+                Establish Your Hold
+            </button>
+
+
+            <button
+                class="menu-button"
+                type="button"
+                data-menu-action="return"
+            >
+                Return to Your Hold
+            </button>
+
+
+            <button
+                class="menu-button"
+                type="button"
+                data-menu-action="settings"
+            >
+                Battle Settings
+            </button>
+
+
+            <button
+                class="menu-button"
+                type="button"
+                data-menu-action="withdraw"
+            >
+                Withdraw
+            </button>
+
+        </nav>
+    `;
+
+}
+
+
+/* ========================================
+   ESTABLISH HOLD
+======================================== */
+
+function showEstablishHold() {
+
+    menuContent.innerHTML = `
+        <div class="hold-panel">
+
+            <label
+                class="hold-label"
+                for="holdName"
+            >
+                Hold Name
+            </label>
+
+
+            <input
+                id="holdName"
+                class="hold-name-input"
+                type="text"
+                maxlength="24"
+                autocomplete="off"
+                spellcheck="false"
+                placeholder="Name your Hold"
+            >
+
+
+            <button
+                id="sealHoldButton"
+                class="seal-hold-button"
+                type="button"
+            >
+                Seal Your Hold
+            </button>
+
+
+            <div
+                id="holdError"
+                class="hold-error"
+                aria-live="polite"
+            ></div>
+
+
+            <div
+                id="sealForgingText"
+                class="seal-forging-text"
+            >
+                &gt; A Seal will be forged for you
+            </div>
+
+
+            <div
+                id="generatedSeal"
+                class="generated-seal"
+                aria-live="polite"
+            ></div>
+
+
+            <div
+                id="sealWarning"
+                class="seal-warning"
+            >
+                Keep this Seal.
+                It grants passage back to your Hold.
+            </div>
+
+
+            <button
+                id="holdReturnButton"
+                class="hold-return-button"
+                type="button"
+            >
+                Return
+            </button>
+
+        </div>
+    `;
+
+
+    const holdName =
+        document.getElementById("holdName");
+
+
+    requestAnimationFrame(
+        () => holdName?.focus()
+    );
+
+}
+
+
+/* ========================================
+   FORGE SEAL
+======================================== */
+
+let sealForging = false;
+
+
+function forgeSeal() {
+
+    if (sealForging) return;
+
+
+    const holdNameInput =
+        document.getElementById("holdName");
+
+    const error =
+        document.getElementById("holdError");
+
+    const forgingText =
+        document.getElementById(
+            "sealForgingText"
+        );
+
+    const generatedSeal =
+        document.getElementById(
+            "generatedSeal"
+        );
+
+    const sealWarning =
+        document.getElementById(
+            "sealWarning"
+        );
+
+    const returnButton =
+        document.getElementById(
+            "holdReturnButton"
+        );
+
+    const sealButton =
+        document.getElementById(
+            "sealHoldButton"
+        );
+
+
+    const holdName =
+        holdNameInput.value.trim();
+
+
+    if (!holdName) {
+
+        error.textContent =
+            "Your Hold must first bear a name.";
+
+        holdNameInput.focus();
+
+        return;
+    }
+
+
+    error.textContent = "";
+
+    sealForging = true;
+
+
+    /*
+     * Lock the name once forging begins.
+     */
+
+    holdNameInput.disabled = true;
+
+    sealButton.disabled = true;
+
+    sealButton.style.opacity = "0.35";
+
+    sealButton.style.cursor = "default";
+
+
+    /*
+     * First reveal:
+     * A Seal will be forged for you
+     */
+
+    forgingText.classList.add(
+        "is-visible"
+    );
+
+
+    /*
+     * Generate a four-digit Seal.
+     *
+     * 1000 - 9999
+     */
+
+    const seal =
+        Math.floor(
+            1000 +
+            Math.random() * 9000
+        );
+
+
+    /*
+     * Reveal the Seal after the
+     * forging message has had time
+     * to breathe.
+     */
+
+    window.setTimeout(
+        () => {
+
+            generatedSeal.textContent =
+                String(seal)
+                    .split("")
+                    .join("  ");
+
+            generatedSeal.classList.add(
+                "is-visible"
+            );
+
+        },
+        1700
+    );
+
+
+    /*
+     * Reveal the ancient warning.
+     */
+
+    window.setTimeout(
+        () => {
+
+            sealWarning.classList.add(
+                "is-visible"
+            );
+
+        },
+        2800
+    );
+
+
+    /*
+     * Finally allow return.
+     */
+
+    window.setTimeout(
+        () => {
+
+            returnButton.classList.add(
+                "is-visible"
+            );
+
+            sealForging = false;
+
+        },
+        3500
+    );
+
+}
 })();

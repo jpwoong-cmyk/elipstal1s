@@ -1,18 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Ecliptalis</title>
 
     <link rel="stylesheet" href="css/main.css">
-    <script src="js/mainscreen_animation.js" defer></script>
+
+    <script
+        src="js/mainscreen_animation.js"
+        defer>
+    </script>
 </head>
+
 
 <body>
 
 <main class="main-screen">
 
+    <!-- Falling shadow sparks -->
     <canvas
         id="mainScreenSparks"
         class="main-screen-sparks"
@@ -20,8 +28,10 @@
     </canvas>
 
 
+    <!-- LEFT SIDE -->
     <section class="main-menu">
 
+        <!-- TITLE NEVER CHANGES -->
         <img
             class="game-title-logo"
             src="assets/mainscreen_title.png"
@@ -29,28 +39,61 @@
             draggable="false"
         >
 
-        <nav class="menu-options" aria-label="Main menu">
 
-            <button class="menu-button" type="button">
-                Establish Your Hold
-            </button>
+        <!-- ONLY THIS AREA CHANGES -->
+        <div
+            id="menuContent"
+            class="menu-content"
+        >
 
-            <button class="menu-button" type="button">
-                Return to Your Hold
-            </button>
+            <nav
+                class="menu-options"
+                aria-label="Main menu"
+            >
 
-            <button class="menu-button" type="button">
-                Battle Settings
-            </button>
+                <button
+                    class="menu-button"
+                    type="button"
+                    data-menu-action="establish"
+                >
+                    Establish Your Hold
+                </button>
 
-            <button class="menu-button" type="button">
-                Withdraw
-            </button>
-        </nav>
+
+                <button
+                    class="menu-button"
+                    type="button"
+                    data-menu-action="return"
+                >
+                    Return to Your Hold
+                </button>
+
+
+                <button
+                    class="menu-button"
+                    type="button"
+                    data-menu-action="settings"
+                >
+                    Battle Settings
+                </button>
+
+
+                <button
+                    class="menu-button"
+                    type="button"
+                    data-menu-action="withdraw"
+                >
+                    Withdraw
+                </button>
+
+            </nav>
+
+        </div>
 
     </section>
 
 
+    <!-- CHARACTER NEVER CHANGES -->
     <div class="main-art">
 
         <img
@@ -64,4 +107,5 @@
 </main>
 
 </body>
+
 </html>
