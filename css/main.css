@@ -1,6 +1,11 @@
+/* ================================
+   GLOBAL
+================================ */
+
 * {
     box-sizing: border-box;
 }
+
 
 html,
 body {
@@ -9,227 +14,390 @@ body {
     margin: 0;
 }
 
+
 body {
     overflow: hidden;
+
     background: #000;
     color: #fff;
-    font-family: Arial, Helvetica, sans-serif;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
 }
+
+
+
+/* ================================
+   MAIN SCREEN
+================================ */
 
 .main-screen {
     position: relative;
+
     width: 100vw;
     height: 100svh;
+
     min-height: 520px;
+
     overflow: hidden;
+
     background: #000;
 }
 
+
+
+/* ================================
+   PARTICLE CANVAS
+================================ */
+
 .main-screen-sparks {
     position: absolute;
+
     inset: 0;
+
     width: 100%;
     height: 100%;
+
     z-index: 0;
+
     pointer-events: none;
 }
 
+
+
+/* ================================
+   LEFT MENU AREA
+================================ */
+
 .main-menu {
     position: relative;
+
     z-index: 2;
+
     height: 100%;
-    padding-top: clamp(55px, 8vh, 100px);
-    padding-left: clamp(45px, 7.5vw, 125px);
+
+    padding-top: clamp(
+        45px,
+        6vh,
+        80px
+    );
+
+    padding-left: clamp(
+        45px,
+        6vw,
+        100px
+    );
 }
 
-.game-title {
-    margin: 0;
-    font-size: clamp(48px, 6.5vw, 106px);
-    font-weight: 300;
-    line-height: 1;
-    letter-spacing: clamp(10px, 1.7vw, 28px);
-    white-space: nowrap;
+
+
+/* ================================
+   TITLE IMAGE
+================================ */
+
+.game-title-logo {
+    display: block;
+
+    width: clamp(
+        390px,
+        43vw,
+        720px
+    );
+
+    height: auto;
+
+    object-fit: contain;
+
+    object-position: left center;
+
+    user-select: none;
+
+    pointer-events: none;
 }
+
+
+
+/* ================================
+   MENU
+================================ */
 
 .menu-options {
     display: flex;
+
     flex-direction: column;
+
     align-items: flex-start;
-    gap: clamp(22px, 3vh, 34px);
-    margin-top: clamp(90px, 14vh, 145px);
+
+    gap: clamp(
+        22px,
+        3vh,
+        34px
+    );
+
+    margin-top: clamp(
+        65px,
+        9vh,
+        100px
+    );
 }
+
+
 
 .menu-button {
     position: relative;
+
     padding: 0;
+
     border: 0;
+
     background: transparent;
+
     color: #f1f1f1;
+
     font: inherit;
-    font-size: clamp(19px, 1.8vw, 31px);
+
+    font-size: clamp(
+        19px,
+        1.8vw,
+        31px
+    );
+
     font-weight: 400;
+
     letter-spacing: 0.02em;
+
     cursor: pointer;
-    transition: color 160ms ease, transform 160ms ease;
+
+    transition:
+        color 160ms ease,
+        transform 160ms ease;
 }
+
+
+
+/* Menu selection line */
 
 .menu-button::before {
     content: "";
+
     position: absolute;
+
     left: -28px;
     top: 50%;
+
     width: 0;
     height: 1px;
+
     background: currentColor;
+
     transform: translateY(-50%);
-    transition: width 160ms ease;
+
+    transition:
+        width 160ms ease;
 }
+
+
 
 .menu-button:hover,
 .menu-button:focus-visible {
     color: #fff;
-    transform: translateX(8px);
+
+    transform:
+        translateX(8px);
 }
+
+
 
 .menu-button:hover::before,
 .menu-button:focus-visible::before {
     width: 18px;
 }
 
+
+
 .menu-button:focus-visible {
     outline: none;
 }
 
+
+
+/* ================================
+   MAIN CHARACTER
+================================ */
+
 .main-art {
     position: absolute;
+
     right: 2vw;
     bottom: 0;
-    width: min(53vw, 850px);
+
+    width: min(
+        53vw,
+        850px
+    );
+
     height: 96%;
+
     display: flex;
+
     align-items: flex-end;
     justify-content: flex-end;
+
     z-index: 1;
+
     pointer-events: none;
 }
 
+
+
 .main-art img {
     display: block;
+
     width: 100%;
     height: 100%;
+
     object-fit: contain;
-    object-position: right bottom;
+
+    object-position:
+        right bottom;
+
     user-select: none;
 }
 
-@keyframes demonEyeFlare {
-    0%,
-    68%,
-    100% {
-        opacity: 0.68;
-        box-shadow:
-            0 0 3px rgba(255, 70, 70, 0.95),
-            0 0 8px rgba(255, 0, 0, 0.8),
-            0 0 15px rgba(255, 0, 0, 0.5);
-    }
 
-    75% {
-        opacity: 1;
-        box-shadow:
-            0 0 5px rgba(255, 220, 220, 1),
-            0 0 12px rgba(255, 45, 45, 1),
-            0 0 26px rgba(255, 0, 0, 1),
-            0 0 48px rgba(255, 0, 0, 0.78);
-    }
 
-    80% {
-        opacity: 0.82;
-        box-shadow:
-            0 0 4px rgba(255, 70, 70, 1),
-            0 0 10px rgba(255, 0, 0, 0.9),
-            0 0 20px rgba(255, 0, 0, 0.62);
-    }
-}
+/* ================================
+   TABLET
+================================ */
 
 @media (max-width: 1000px) {
+
     .main-menu {
-        padding-left: 55px;
+        padding-left: 50px;
     }
 
-    .game-title {
-        font-size: clamp(46px, 8vw, 78px);
+
+    .game-title-logo {
+        width: min(
+            52vw,
+            600px
+        );
     }
+
 
     .main-art {
         right: -8vw;
+
         width: 58vw;
         height: 88%;
     }
+
 }
 
+
+
+/* ================================
+   MOBILE
+================================ */
+
 @media (max-width: 700px) {
+
     .main-screen {
         min-height: 600px;
     }
 
+
     .main-menu {
-        padding-top: 42px;
-        padding-left: 28px;
+        padding-top: 32px;
+
+        padding-left: 24px;
         padding-right: 20px;
     }
 
-    .game-title {
-        font-size: clamp(38px, 11vw, 60px);
-        letter-spacing: clamp(6px, 2.5vw, 13px);
+
+    .game-title-logo {
+        width: min(
+            88vw,
+            520px
+        );
     }
 
+
     .menu-options {
-        margin-top: 60px;
+        margin-top: 45px;
+
         gap: 22px;
     }
+
 
     .menu-button {
         font-size: 21px;
     }
 
+
     .main-art {
         right: -18vw;
+
         bottom: -3%;
+
         width: 86vw;
         height: 70%;
+
         opacity: 0.82;
     }
+
 }
 
+
+
+/* ================================
+   SMALL MOBILE
+================================ */
+
 @media (max-width: 440px) {
+
     .main-menu {
-        padding-left: 22px;
+        padding-left: 20px;
     }
 
-    .game-title {
-        font-size: 35px;
-        letter-spacing: 7px;
+
+    .game-title-logo {
+        width: 90vw;
     }
+
 
     .menu-options {
-        margin-top: 48px;
+        margin-top: 35px;
     }
+
 
     .menu-button {
         font-size: 19px;
     }
 
+
     .main-art {
         right: -28vw;
+
         width: 105vw;
         height: 66%;
     }
+
 }
 
+
+
+/* ================================
+   REDUCED MOTION
+================================ */
+
 @media (prefers-reduced-motion: reduce) {
+
     .menu-button,
-    .menu-button::before{
+    .menu-button::before {
         transition: none;
-        animation: none;
     }
+
 }
