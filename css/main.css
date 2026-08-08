@@ -1,0 +1,326 @@
+/* ================================
+   ECLIPTALIS MAIN SCREEN
+================================ */
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    overflow: hidden;
+    background: #000;
+    color: #fff;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+}
+
+
+/* ================================
+   SCREEN
+================================ */
+
+.main-screen {
+    position: relative;
+
+    width: 100vw;
+    height: 100svh;
+
+    min-height: 520px;
+
+    overflow: hidden;
+
+    background: #000;
+}
+
+
+/* ================================
+   LEFT SIDE
+================================ */
+
+.main-menu {
+    position: relative;
+    z-index: 2;
+
+    height: 100%;
+
+    padding-top: clamp(55px, 8vh, 100px);
+    padding-left: clamp(45px, 7.5vw, 125px);
+}
+
+
+/* ================================
+   TITLE
+================================ */
+
+.game-title {
+    margin: 0;
+
+    font-size: clamp(48px, 6.5vw, 106px);
+    font-weight: 300;
+
+    line-height: 1;
+
+    letter-spacing: clamp(
+        10px,
+        1.7vw,
+        28px
+    );
+
+    white-space: nowrap;
+}
+
+
+/* ================================
+   MENU
+================================ */
+
+.menu-options {
+    display: flex;
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    gap: clamp(22px, 3vh, 34px);
+
+    margin-top: clamp(90px, 14vh, 145px);
+}
+
+
+.menu-button {
+    position: relative;
+
+    padding: 0;
+
+    border: 0;
+
+    background: transparent;
+
+    color: #f1f1f1;
+
+    font: inherit;
+
+    font-size: clamp(19px, 1.8vw, 31px);
+    font-weight: 400;
+
+    letter-spacing: 0.02em;
+
+    cursor: pointer;
+
+    transition:
+        color 160ms ease,
+        transform 160ms ease;
+}
+
+
+/* subtle selector line */
+.menu-button::before {
+    content: "";
+
+    position: absolute;
+
+    left: -28px;
+    top: 50%;
+
+    width: 0;
+    height: 1px;
+
+    background: currentColor;
+
+    transform: translateY(-50%);
+
+    transition: width 160ms ease;
+}
+
+
+.menu-button:hover,
+.menu-button:focus-visible {
+    color: #fff;
+    transform: translateX(8px);
+}
+
+
+.menu-button:hover::before,
+.menu-button:focus-visible::before {
+    width: 18px;
+}
+
+
+.menu-button:focus-visible {
+    outline: none;
+}
+
+
+/* ================================
+   MAIN ART
+================================ */
+
+.main-art {
+    position: absolute;
+
+    z-index: 1;
+
+    right: clamp(-15px, 0vw, 0px);
+    bottom: 0;
+
+    width: min(48vw, 770px);
+    height: 96%;
+
+    display: flex;
+
+    align-items: flex-end;
+    justify-content: flex-end;
+
+    pointer-events: none;
+}
+
+
+.main-art img {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+    object-position: right bottom;
+
+    user-select: none;
+}
+
+
+/* ================================
+   TABLET
+================================ */
+
+@media (max-width: 1000px) {
+
+    .main-menu {
+        padding-left: 55px;
+    }
+
+    .game-title {
+        font-size: clamp(46px, 8vw, 78px);
+    }
+
+    .main-art {
+        right: -8vw;
+
+        width: 58vw;
+        height: 88%;
+    }
+
+}
+
+
+/* ================================
+   MOBILE / PORTRAIT
+================================ */
+
+@media (max-width: 700px) {
+
+    .main-screen {
+        min-height: 600px;
+    }
+
+
+    .main-menu {
+        padding-top: 42px;
+        padding-left: 28px;
+        padding-right: 20px;
+    }
+
+
+    .game-title {
+        font-size: clamp(38px, 11vw, 60px);
+
+        letter-spacing: clamp(
+            6px,
+            2.5vw,
+            13px
+        );
+    }
+
+
+    .menu-options {
+        margin-top: 60px;
+        gap: 22px;
+    }
+
+
+    .menu-button {
+        font-size: 21px;
+    }
+
+
+    .main-art {
+        right: -18vw;
+        bottom: -3%;
+
+        width: 86vw;
+        height: 70%;
+
+        opacity: 0.78;
+    }
+
+}
+
+
+/* ================================
+   VERY SMALL SCREENS
+================================ */
+
+@media (max-width: 440px) {
+
+    .main-menu {
+        padding-left: 22px;
+    }
+
+
+    .game-title {
+        font-size: 35px;
+
+        letter-spacing: 7px;
+    }
+
+
+    .menu-options {
+        margin-top: 48px;
+    }
+
+
+    .menu-button {
+        font-size: 19px;
+    }
+
+
+    .main-art {
+        right: -28vw;
+
+        width: 105vw;
+        height: 66%;
+    }
+
+}
+
+
+/* ================================
+   REDUCED MOTION
+================================ */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .menu-button,
+    .menu-button::before {
+        transition: none;
+    }
+
+}
