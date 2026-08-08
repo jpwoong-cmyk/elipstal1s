@@ -104,7 +104,7 @@ body {
 
     height: auto;
 
-    object-fit: contain;
+    object-fit: cover;
     object-position: center 50%;
 
     user-select: none;
