@@ -765,49 +765,176 @@ function createWell() {
     );
 
 
-    const ring =
-        new THREE.Mesh(
-            new THREE.CylinderGeometry(
-                1.35,
-                1.45,
-                0.65,
-                16,
-                1,
-                true
+    /* ================================
+       STONE RIM
+    ================================ */
+
+    const stoneCount = 18;
+
+    const radius = 1.45;
+
+
+    for (
+        let index = 0;
+        index < stoneCount;
+        index += 1
+    ) {
+
+        const angle =
+            (
+                index /
+                stoneCount
+            ) *
+            Math.PI *
+            2;
+
+
+        const stone =
+            new THREE.Mesh(
+                new THREE.BoxGeometry(
+                    0.58,
+                    0.42,
+                    0.42
+                ),
+                makeMaterial(
+                    index % 3 === 0
+                        ? PALETTE.stoneDark
+                        : PALETTE.stone,
+                    {
+                        roughness: 1
+                    }
+                )
+            );
+
+
+        stone.position.set(
+            Math.cos(angle) *
+                radius,
+
+            0.35 +
+                Math.sin(
+                    index *
+                    1.7
+                ) *
+                0.035,
+
+            Math.sin(angle) *
+                radius
+        );
+
+
+        stone.rotation.y =
+            -angle;
+
+
+        stone.rotation.z =
+            randomBetween(
+                -0.08,
+                0.08
+            );
+
+
+        stone.scale.set(
+            randomBetween(
+                0.88,
+                1.12
             ),
-            makeMaterial(
-                PALETTE.stone
+
+            randomBetween(
+                0.9,
+                1.15
+            ),
+
+            randomBetween(
+                0.9,
+                1.12
             )
         );
 
 
-    ring.position.y =
-        0.36;
+        stone.castShadow =
+            true;
 
-    ring.castShadow =
+        stone.receiveShadow =
+            true;
+
+
+        well.add(
+            stone
+        );
+
+    }
+
+
+    /* ================================
+       INNER DARK WALL
+    ================================ */
+
+    const innerWall =
+        new THREE.Mesh(
+            new THREE.CylinderGeometry(
+                1.18,
+                1.25,
+                0.62,
+                24,
+                1,
+                true
+            ),
+            makeMaterial(
+                PALETTE.stoneDark,
+                {
+                    roughness: 1
+                }
+            )
+        );
+
+
+    innerWall.position.y =
+        0.22;
+
+
+    innerWall.castShadow =
         true;
 
-    ring.receiveShadow =
+    innerWall.receiveShadow =
         true;
 
 
     well.add(
-        ring
+        innerWall
     );
+
+
+    /* ================================
+       WATER
+    ================================ */
+
+    const waterMaterial =
+        new THREE.MeshStandardMaterial({
+            color:
+                PALETTE.water,
+
+            roughness:
+                0.25,
+
+            metalness:
+                0.05,
+
+            transparent:
+                true,
+
+            opacity:
+                0.88
+        });
 
 
     const water =
         new THREE.Mesh(
             new THREE.CircleGeometry(
-                1.12,
-                20
+                1.05,
+                32
             ),
-            makeMaterial(
-                PALETTE.water,
-                {
-                    roughness: 0.45
-                }
-            )
+            waterMaterial
         );
 
 
@@ -815,8 +942,9 @@ function createWell() {
         -Math.PI /
         2;
 
+
     water.position.y =
-        0.27;
+        0.08;
 
 
     well.add(
@@ -824,19 +952,62 @@ function createWell() {
     );
 
 
+    /* subtle inner water highlight */
+
+    const waterHighlight =
+        new THREE.Mesh(
+            new THREE.RingGeometry(
+                0.78,
+                1.02,
+                32
+            ),
+            new THREE.MeshBasicMaterial({
+                color:
+                    0x6d989d,
+
+                transparent:
+                    true,
+
+                opacity:
+                    0.12,
+
+                side:
+                    THREE.DoubleSide
+            })
+        );
+
+
+    waterHighlight.rotation.x =
+        -Math.PI /
+        2;
+
+
+    waterHighlight.position.y =
+        0.085;
+
+
+    well.add(
+        waterHighlight
+    );
+
+
+    /* ================================
+       WOODEN POSTS
+    ================================ */
+
     for (
         const x of [
-            -1.3,
-            1.3
+            -1.65,
+            1.65
         ]
     ) {
 
         const post =
             new THREE.Mesh(
                 new THREE.CylinderGeometry(
-                    0.11,
-                    0.13,
-                    2.5,
+                    0.12,
+                    0.15,
+                    2.7,
                     8
                 ),
                 makeMaterial(
@@ -847,9 +1018,10 @@ function createWell() {
 
         post.position.set(
             x,
-            1.55,
+            1.45,
             0
         );
+
 
         post.castShadow =
             true;
@@ -862,12 +1034,16 @@ function createWell() {
     }
 
 
+    /* ================================
+       CROSS BEAM
+    ================================ */
+
     const beam =
         new THREE.Mesh(
             new THREE.CylinderGeometry(
-                0.10,
-                0.10,
-                3.0,
+                0.11,
+                0.11,
+                3.6,
                 8
             ),
             makeMaterial(
@@ -880,8 +1056,13 @@ function createWell() {
         Math.PI /
         2;
 
-    beam.position.y =
-        2.45;
+
+    beam.position.set(
+        0,
+        2.55,
+        0
+    );
+
 
     beam.castShadow =
         true;
@@ -889,6 +1070,70 @@ function createWell() {
 
     well.add(
         beam
+    );
+
+
+    /* ================================
+       ROPE / SHAFT
+    ================================ */
+
+    const rope =
+        new THREE.Mesh(
+            new THREE.CylinderGeometry(
+                0.025,
+                0.025,
+                1.4,
+                6
+            ),
+            makeMaterial(
+                0x78654b
+            )
+        );
+
+
+    rope.position.set(
+        0,
+        1.72,
+        0
+    );
+
+
+    well.add(
+        rope
+    );
+
+
+    /* ================================
+       BUCKET
+    ================================ */
+
+    const bucket =
+        new THREE.Mesh(
+            new THREE.CylinderGeometry(
+                0.18,
+                0.22,
+                0.34,
+                10
+            ),
+            makeMaterial(
+                PALETTE.timberDark
+            )
+        );
+
+
+    bucket.position.set(
+        0,
+        0.92,
+        0
+    );
+
+
+    bucket.castShadow =
+        true;
+
+
+    well.add(
+        bucket
     );
 
 
