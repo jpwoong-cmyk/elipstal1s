@@ -1,23 +1,17 @@
 /* ================================
-   ECLIPTALIS — IN-GAME SCREEN V1
+   ECLIPTALIS — IN-GAME SCREEN V2
 ================================ */
 
 :root {
-    --hud-height: 58px;
+    --hud-height: 60px;
+    --slot-width: clamp(78px, 6.7vw, 108px);
 
-    --ink-black: #050606;
-    --steel-1: #d9dde0;
-    --steel-2: #91999e;
-    --steel-3: #535b60;
+    --black-0: #020303;
+    --black-1: #080a0a;
 
-    --grass-dark: #20351e;
-    --grass-mid: #2f5628;
-    --grass-light: #426b35;
-
-    --earth-dark: #32291f;
-    --earth-mid: #57442f;
-
-    --slot-width: clamp(82px, 7.2vw, 116px);
+    --steel-1: #e2e6e8;
+    --steel-2: #aab1b5;
+    --steel-3: #60696e;
 }
 
 
@@ -30,6 +24,7 @@ html,
 body {
     width: 100%;
     height: 100%;
+
     margin: 0;
 }
 
@@ -45,9 +40,9 @@ button {
 
 
 .ingame-body {
-    background: #111;
+    color: #eef0f1;
 
-    color: #eceeef;
+    background: #0d120d;
 
     font-family:
         Arial,
@@ -67,8 +62,6 @@ button {
         minmax(0, 1fr);
 
     overflow: hidden;
-
-    background: #141714;
 }
 
 
@@ -79,30 +72,31 @@ button {
 .ingame-hud {
     position: relative;
 
-    z-index: 20;
+    z-index: 30;
 
     display: grid;
 
     grid-template-columns:
-        minmax(245px, 1.45fr)
-        repeat(4, minmax(145px, 1fr));
+        minmax(230px, 1.35fr)
+        repeat(3, minmax(130px, 0.9fr))
+        minmax(225px, 1.35fr);
 
     min-height: var(--hud-height);
 
     background:
         linear-gradient(
             180deg,
-            #0d0f10 0%,
+            #101313 0%,
             #030404 100%
         );
 
     border-bottom:
         1px solid
-        rgba(187, 194, 199, 0.3);
+        rgba(197, 204, 208, 0.3);
 
     box-shadow:
-        0 8px 24px
-        rgba(0, 0, 0, 0.38);
+        0 8px 26px
+        rgba(0, 0, 0, 0.45);
 }
 
 
@@ -116,7 +110,7 @@ button {
 
     border-right:
         1px solid
-        rgba(168, 174, 180, 0.2);
+        rgba(179, 186, 190, 0.18);
 }
 
 
@@ -125,7 +119,7 @@ button {
 
     padding:
         0
-        clamp(18px, 2vw, 32px);
+        clamp(16px, 2vw, 28px);
 }
 
 
@@ -134,36 +128,30 @@ button {
 
     place-items: center;
 
-    width: 27px;
-    height: 27px;
+    width: 28px;
+    height: 28px;
 
     flex: 0 0 auto;
 
+    color: #d8dde0;
+
     border:
         1px solid
-        rgba(186, 194, 200, 0.38);
-
-    color: #cfd5d9;
+        rgba(190, 198, 203, 0.42);
 
     transform:
         rotate(45deg);
 
     box-shadow:
-        inset 0 0 9px
-        rgba(215, 222, 227, 0.08);
-}
-
-
-.hud-brand-sigil::first-letter {
-    transform:
-        rotate(-45deg);
+        inset 0 0 10px
+        rgba(220, 226, 230, 0.07);
 }
 
 
 .hud-brand-name {
     overflow: hidden;
 
-    color: #f2f3f4;
+    color: #f4f5f5;
 
     font-family:
         Georgia,
@@ -171,13 +159,12 @@ button {
         serif;
 
     font-size: clamp(
-        15px,
+        14px,
         1.3vw,
-        21px
+        20px
     );
 
-    letter-spacing:
-        0.28em;
+    letter-spacing: 0.26em;
 
     white-space: nowrap;
 
@@ -186,13 +173,13 @@ button {
 
 
 .hud-stat {
-    gap: 8px;
-
     justify-content: center;
+
+    gap: 8px;
 
     padding:
         0
-        14px;
+        13px;
 
     white-space: nowrap;
 }
@@ -204,7 +191,7 @@ button {
             191,
             197,
             201,
-            0.68
+            0.65
         );
 
     font-family:
@@ -214,23 +201,92 @@ button {
 
     font-size: clamp(
         11px,
-        0.86vw,
+        0.84vw,
         14px
     );
 
-    letter-spacing:
-        0.04em;
+    letter-spacing: 0.035em;
 }
 
 
 .hud-stat-value {
-    color: #f0f1f2;
+    color: #f0f2f3;
 
     font-size: clamp(
         14px,
-        1.12vw,
-        19px
+        1.05vw,
+        18px
     );
+}
+
+
+.hud-stat-villagers {
+    gap: 13px;
+}
+
+
+.villager-counts {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    color: #eef0f1;
+}
+
+
+.villager-count {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 4px;
+
+    min-width: 32px;
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size: clamp(
+        13px,
+        1vw,
+        17px
+    );
+}
+
+
+.villager-count > span:first-child {
+    color:
+        rgba(
+            190,
+            199,
+            204,
+            0.72
+        );
+}
+
+
+.villager-count strong {
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    font-weight: 400;
+}
+
+
+.villager-count-divider {
+    color:
+        rgba(
+            150,
+            158,
+            162,
+            0.36
+        );
 }
 
 
@@ -247,54 +303,7 @@ button {
 
     isolation: isolate;
 
-    background:
-        radial-gradient(
-            ellipse at 50% 46%,
-            rgba(83, 113, 59, 0.52) 0%,
-            rgba(51, 88, 43, 0.7) 36%,
-            rgba(30, 57, 27, 0.98) 78%
-        ),
-        repeating-linear-gradient(
-            17deg,
-            rgba(255, 255, 255, 0.012) 0 1px,
-            transparent 1px 8px
-        ),
-        var(--grass-dark);
-}
-
-
-.game-world::before {
-    content: "";
-
-    position: absolute;
-
-    inset: 0;
-
-    z-index: -3;
-
-    opacity: 0.35;
-
-    background:
-        radial-gradient(
-            circle at 12% 22%,
-            rgba(110, 139, 76, 0.28) 0 8%,
-            transparent 8.5%
-        ),
-        radial-gradient(
-            circle at 89% 14%,
-            rgba(94, 123, 68, 0.22) 0 10%,
-            transparent 10.5%
-        ),
-        radial-gradient(
-            circle at 14% 80%,
-            rgba(23, 47, 24, 0.45) 0 13%,
-            transparent 13.5%
-        ),
-        radial-gradient(
-            circle at 88% 76%,
-            rgba(21, 43, 22, 0.48) 0 14%,
-            transparent 14.5%
-        );
+    background: #223b20;
 }
 
 
@@ -303,206 +312,15 @@ button {
 
     inset: 0;
 
-    z-index: 12;
+    z-index: 15;
 
     pointer-events: none;
 
     box-shadow:
-        inset 0 0 120px
-        rgba(0, 0, 0, 0.52),
-        inset 0 0 28px
-        rgba(0, 0, 0, 0.3);
-}
-
-
-/* ================================
-   WILDERNESS
-================================ */
-
-.wilderness-layer {
-    position: absolute;
-
-    inset: 0;
-
-    z-index: 1;
-
-    pointer-events: none;
-}
-
-
-.wild-tree {
-    position: absolute;
-
-    left:
-        calc(
-            var(--tree-x)
-            * 1%
-        );
-
-    top:
-        calc(
-            var(--tree-y)
-            * 1%
-        );
-
-    width: 32px;
-    height: 32px;
-
-    transform:
-        translate(-50%, -50%)
-        scale(var(--tree-scale));
-
-    filter:
-        drop-shadow(
-            4px
-            5px
-            4px
-            rgba(0, 0, 0, 0.36)
-        );
-}
-
-
-.wild-tree::before,
-.wild-tree::after {
-    content: "";
-
-    position: absolute;
-
-    border-radius: 50%;
-}
-
-
-.wild-tree::before {
-    inset: 3px;
-
-    background:
-        radial-gradient(
-            circle at 34% 30%,
-            #607b45 0 9%,
-            #395d34 35%,
-            #203e29 68%,
-            #152d21 100%
-        );
-
-    box-shadow:
-        -8px 5px 0 -3px #2c4f2e,
-        8px 6px 0 -4px #1e3d28,
-        1px -7px 0 -4px #496a39;
-}
-
-
-.wild-tree::after {
-    left: 14px;
-    top: 14px;
-
-    width: 5px;
-    height: 7px;
-
-    background: #4a3524;
-
-    box-shadow:
-        0 0 0 1px
-        rgba(0, 0, 0, 0.28);
-}
-
-
-.grass-tuft {
-    position: absolute;
-
-    left:
-        calc(
-            var(--grass-x)
-            * 1%
-        );
-
-    top:
-        calc(
-            var(--grass-y)
-            * 1%
-        );
-
-    width: 13px;
-    height: 13px;
-
-    opacity: var(--grass-opacity);
-
-    transform:
-        rotate(
-            calc(
-                var(--grass-rotate)
-                * 1deg
-            )
-        );
-}
-
-
-.grass-tuft::before {
-    content: "";
-
-    position: absolute;
-
-    left: 6px;
-    top: 1px;
-
-    width: 1px;
-    height: 11px;
-
-    background: #6f8d51;
-
-    box-shadow:
-        -4px 2px 0 #527342,
-        4px 1px 0 #456a3a,
-        -2px -1px 0 #78935a;
-
-    transform:
-        rotate(18deg);
-}
-
-
-.wild-stone {
-    position: absolute;
-
-    left:
-        calc(
-            var(--stone-x)
-            * 1%
-        );
-
-    top:
-        calc(
-            var(--stone-y)
-            * 1%
-        );
-
-    width: 12px;
-    height: 9px;
-
-    border-radius:
-        55%
-        45%
-        48%
-        52%;
-
-    opacity: 0.55;
-
-    background:
-        linear-gradient(
-            135deg,
-            #777b75,
-            #3e4440 70%
-        );
-
-    transform:
-        rotate(
-            calc(
-                var(--stone-rotate)
-                * 1deg
-            )
-        );
-
-    box-shadow:
-        2px 3px 3px
-        rgba(0, 0, 0, 0.28);
+        inset 0 0 110px
+        rgba(0, 0, 0, 0.34),
+        inset 0 0 24px
+        rgba(0, 0, 0, 0.22);
 }
 
 
@@ -515,7 +333,7 @@ button {
 
     inset: 0;
 
-    z-index: 8;
+    z-index: 18;
 
     pointer-events: none;
 }
@@ -538,27 +356,27 @@ button {
     place-items: center;
 
     padding:
-        8px
         7px
-        10px;
+        7px
+        9px;
 
     border:
         1px solid
-        rgba(188, 196, 201, 0.4);
+        rgba(202, 210, 214, 0.42);
 
     background:
         linear-gradient(
             145deg,
-            rgba(15, 18, 18, 0.66),
-            rgba(3, 5, 5, 0.82)
+            rgba(14, 17, 17, 0.56),
+            rgba(2, 4, 4, 0.78)
         );
 
     color:
         rgba(
-            215,
-            220,
-            223,
-            0.72
+            222,
+            227,
+            230,
+            0.75
         );
 
     cursor: pointer;
@@ -579,8 +397,11 @@ button {
     box-shadow:
         inset 0 0 0 1px
         rgba(255, 255, 255, 0.025),
-        0 8px 22px
-        rgba(0, 0, 0, 0.28);
+        0 9px 26px
+        rgba(0, 0, 0, 0.26);
+
+    backdrop-filter:
+        blur(2px);
 
     transform:
         translate(-50%, -50%);
@@ -602,7 +423,7 @@ button {
 
     border:
         1px solid
-        rgba(162, 169, 173, 0.11);
+        rgba(172, 179, 183, 0.12);
 
     pointer-events: none;
 }
@@ -612,22 +433,22 @@ button {
 .deploy-slot:focus-visible,
 .deploy-slot.is-selected {
     border-color:
-        rgba(224, 229, 232, 0.82);
+        rgba(231, 235, 237, 0.88);
 
     background:
         linear-gradient(
             145deg,
-            rgba(37, 42, 43, 0.76),
-            rgba(7, 9, 9, 0.9)
+            rgba(39, 44, 45, 0.68),
+            rgba(6, 8, 8, 0.86)
         );
 
     box-shadow:
         inset 0 0 0 1px
-        rgba(255, 255, 255, 0.055),
-        0 0 14px
-        rgba(197, 208, 214, 0.12),
-        0 9px 24px
-        rgba(0, 0, 0, 0.34);
+        rgba(255, 255, 255, 0.05),
+        0 0 15px
+        rgba(206, 215, 220, 0.13),
+        0 10px 28px
+        rgba(0, 0, 0, 0.33);
 
     outline: none;
 
@@ -642,10 +463,10 @@ button {
 
     color:
         rgba(
-            171,
-            178,
-            182,
-            0.5
+            173,
+            181,
+            185,
+            0.54
         );
 
     font-family:
@@ -653,7 +474,7 @@ button {
         "Times New Roman",
         serif;
 
-    font-size: 10px;
+    font-size: 9px;
 
     letter-spacing: 0.08em;
 }
@@ -662,10 +483,10 @@ button {
 .deploy-slot-mark {
     color:
         rgba(
-            196,
             204,
-            209,
-            0.38
+            211,
+            215,
+            0.42
         );
 
     font-family:
@@ -674,9 +495,9 @@ button {
         serif;
 
     font-size: clamp(
-        24px,
-        2.2vw,
-        38px
+        23px,
+        2vw,
+        34px
     );
 
     font-weight: 300;
@@ -688,10 +509,10 @@ button {
 .deploy-slot-label {
     color:
         rgba(
-            217,
-            221,
+            220,
             224,
-            0.7
+            226,
+            0.72
         );
 
     font-family:
@@ -700,9 +521,9 @@ button {
         serif;
 
     font-size: clamp(
-        10px,
-        0.8vw,
-        13px
+        9px,
+        0.74vw,
+        12px
     );
 
     letter-spacing: 0.09em;
@@ -712,7 +533,7 @@ button {
 
 
 .deploy-slot-1 {
-    left: 33%;
+    left: 31%;
     top: 18%;
 }
 
@@ -724,37 +545,37 @@ button {
 
 
 .deploy-slot-3 {
-    left: 67%;
+    left: 69%;
     top: 18%;
 }
 
 
 .deploy-slot-4 {
-    left: 76%;
+    left: 78%;
     top: 45%;
 }
 
 
 .deploy-slot-5 {
-    left: 67%;
+    left: 69%;
     top: 72%;
 }
 
 
 .deploy-slot-6 {
     left: 50%;
-    top: 79%;
+    top: 80%;
 }
 
 
 .deploy-slot-7 {
-    left: 33%;
+    left: 31%;
     top: 72%;
 }
 
 
 .deploy-slot-8 {
-    left: 24%;
+    left: 22%;
     top: 45%;
 }
 
@@ -778,12 +599,12 @@ button {
         28px
     );
 
-    z-index: 14;
+    z-index: 24;
 
     width: clamp(
         145px,
         11vw,
-        185px
+        180px
     );
 
     display: grid;
@@ -793,7 +614,7 @@ button {
 
 
 .ingame-action-button {
-    min-height: 39px;
+    min-height: 38px;
 
     padding:
         8px
@@ -801,7 +622,7 @@ button {
 
     border:
         1px solid
-        rgba(186, 193, 198, 0.46);
+        rgba(190, 198, 202, 0.47);
 
     background:
         linear-gradient(
@@ -812,10 +633,10 @@ button {
 
     color:
         rgba(
-            229,
-            232,
+            231,
             234,
-            0.86
+            236,
+            0.88
         );
 
     font-family:
@@ -851,11 +672,11 @@ button {
     color: #fff;
 
     border-color:
-        rgba(220, 226, 230, 0.84);
+        rgba(224, 229, 232, 0.84);
 
     box-shadow:
         0 0 12px
-        rgba(197, 207, 214, 0.1);
+        rgba(198, 208, 214, 0.11);
 
     outline: none;
 
@@ -883,12 +704,13 @@ button {
         28px
     );
 
-    z-index: 14;
+    z-index: 24;
 
-    max-width: min(
-        420px,
-        48vw
-    );
+    max-width:
+        min(
+            430px,
+            48vw
+        );
 
     min-height: 22px;
 
@@ -898,9 +720,17 @@ button {
 
     color:
         rgba(
-            218,
-            222,
+            220,
             224,
+            226,
+            0
+        );
+
+    background:
+        rgba(
+            3,
+            5,
+            5,
             0
         );
 
@@ -913,8 +743,6 @@ button {
 
     font-style: italic;
 
-    letter-spacing: 0.025em;
-
     pointer-events: none;
 
     transition:
@@ -926,10 +754,10 @@ button {
 .field-message.is-visible {
     color:
         rgba(
-            218,
-            222,
+            220,
             224,
-            0.76
+            226,
+            0.78
         );
 
     background:
@@ -937,7 +765,7 @@ button {
             3,
             5,
             5,
-            0.44
+            0.48
         );
 }
 
@@ -949,18 +777,20 @@ button {
 @media (max-width: 1050px) {
 
     :root {
-        --slot-width: clamp(
-            72px,
-            8.5vw,
-            96px
-        );
+        --slot-width:
+            clamp(
+                69px,
+                8vw,
+                91px
+            );
     }
 
 
     .ingame-hud {
         grid-template-columns:
-            minmax(210px, 1.25fr)
-            repeat(4, minmax(115px, 1fr));
+            minmax(190px, 1.15fr)
+            repeat(3, minmax(95px, 0.72fr))
+            minmax(190px, 1.12fr);
     }
 
 
@@ -978,13 +808,13 @@ button {
     }
 
 
-    .hud-stat::before {
+    .hud-stat:not(.hud-stat-villagers)::before {
         color:
             rgba(
-                177,
-                184,
+                181,
                 188,
-                0.56
+                192,
+                0.55
             );
 
         font-family:
@@ -992,7 +822,7 @@ button {
             "Times New Roman",
             serif;
 
-        font-size: 10px;
+        font-size: 9px;
 
         letter-spacing: 0.07em;
 
@@ -1001,7 +831,7 @@ button {
 
 
     .hud-stat:nth-child(2)::before {
-        content: "Health";
+        content: "HP";
     }
 
 
@@ -1014,11 +844,6 @@ button {
         content: "Coin";
     }
 
-
-    .hud-stat:nth-child(5)::before {
-        content: "Villagers";
-    }
-
 }
 
 
@@ -1029,8 +854,8 @@ button {
 @media (max-width: 700px) {
 
     :root {
-        --hud-height: 92px;
-        --slot-width: 67px;
+        --hud-height: 94px;
+        --slot-width: 62px;
     }
 
 
@@ -1045,8 +870,8 @@ button {
             );
 
         grid-template-rows:
-            46px
-            46px;
+            47px
+            47px;
     }
 
 
@@ -1056,31 +881,31 @@ button {
 
         padding:
             0
-            13px;
+            12px;
     }
 
 
     .hud-brand-name {
-        font-size: 13px;
+        font-size: 12px;
 
-        letter-spacing: 0.2em;
+        letter-spacing: 0.18em;
     }
 
 
     .hud-brand-sigil {
-        width: 22px;
-        height: 22px;
+        width: 21px;
+        height: 21px;
     }
 
 
     .hud-stat {
         border-top:
             1px solid
-            rgba(168, 174, 180, 0.14);
+            rgba(170, 177, 181, 0.14);
 
         border-right:
             1px solid
-            rgba(168, 174, 180, 0.14);
+            rgba(170, 177, 181, 0.14);
     }
 
 
@@ -1093,58 +918,67 @@ button {
     .hud-stat-villagers {
         grid-column:
             span 2;
+
+        gap: 8px;
     }
 
 
     .hud-stat-value {
-        font-size: 13px;
+        font-size: 12px;
+    }
+
+
+    .villager-count {
+        min-width: 26px;
+
+        font-size: 12px;
     }
 
 
     .deploy-slot-1 {
-        left: 26%;
+        left: 25%;
         top: 20%;
     }
 
 
     .deploy-slot-2 {
         left: 50%;
-        top: 15%;
+        top: 14%;
     }
 
 
     .deploy-slot-3 {
-        left: 74%;
+        left: 75%;
         top: 20%;
     }
 
 
     .deploy-slot-4 {
-        left: 84%;
+        left: 86%;
         top: 43%;
     }
 
 
     .deploy-slot-5 {
-        left: 74%;
-        top: 66%;
+        left: 75%;
+        top: 65%;
     }
 
 
     .deploy-slot-6 {
         left: 50%;
-        top: 72%;
+        top: 71%;
     }
 
 
     .deploy-slot-7 {
-        left: 26%;
-        top: 66%;
+        left: 25%;
+        top: 65%;
     }
 
 
     .deploy-slot-8 {
-        left: 16%;
+        left: 14%;
         top: 43%;
     }
 
@@ -1179,7 +1013,7 @@ button {
 
         padding:
             6px
-            5px;
+            4px;
 
         font-size: 10px;
     }
@@ -1197,8 +1031,8 @@ button {
 
         width:
             min(
-                86vw,
-                380px
+                88vw,
+                390px
             );
 
         max-width: none;
@@ -1219,28 +1053,37 @@ button {
 @media (max-width: 440px) {
 
     :root {
-        --slot-width: 57px;
+        --slot-width: 53px;
     }
 
 
     .hud-brand {
-        gap: 8px;
+        gap: 7px;
 
         padding:
             0
-            9px;
+            8px;
     }
 
 
     .hud-brand-name {
-        font-size: 11px;
+        font-size: 10px;
 
-        letter-spacing: 0.15em;
+        letter-spacing: 0.13em;
     }
 
 
-    .hud-stat-value {
-        font-size: 12px;
+    .villager-counts {
+        gap: 4px;
+    }
+
+
+    .villager-count {
+        min-width: 23px;
+
+        gap: 2px;
+
+        font-size: 11px;
     }
 
 
@@ -1252,18 +1095,14 @@ button {
     }
 
 
-    .deploy-slot-number {
-        font-size: 8px;
-    }
-
-
+    .deploy-slot-number,
     .deploy-slot-label {
-        font-size: 8px;
+        font-size: 7px;
     }
 
 
     .deploy-slot-mark {
-        font-size: 20px;
+        font-size: 18px;
     }
 
 

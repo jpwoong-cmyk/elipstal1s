@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0"
@@ -20,15 +21,18 @@
         href="css/ingame_town.css"
     >
 
-    <script
-        src="js/ingame_town.js"
-        defer>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.184.0/build/three.module.js"
+        }
+    }
     </script>
 
     <script
+        type="module"
         src="js/ingame_screen.js"
-        defer>
-    </script>
+    ></script>
 </head>
 
 
@@ -42,6 +46,7 @@
     >
 
         <div class="hud-brand">
+
             <span
                 class="hud-brand-sigil"
                 aria-hidden="true"
@@ -52,10 +57,12 @@
             <span class="hud-brand-name">
                 ECLIPTALIS
             </span>
+
         </div>
 
 
         <div class="hud-stat">
+
             <span class="hud-stat-label">
                 Town Health
             </span>
@@ -66,10 +73,12 @@
             >
                 100%
             </span>
+
         </div>
 
 
         <div class="hud-stat">
+
             <span class="hud-stat-label">
                 Food
             </span>
@@ -80,10 +89,12 @@
             >
                 0
             </span>
+
         </div>
 
 
         <div class="hud-stat">
+
             <span class="hud-stat-label">
                 Coin
             </span>
@@ -94,20 +105,58 @@
             >
                 0
             </span>
+
         </div>
 
 
-        <div class="hud-stat hud-stat-villagers">
+        <div
+            class="hud-stat hud-stat-villagers"
+            aria-label="Villager population"
+        >
+
             <span class="hud-stat-label">
                 Villagers
             </span>
 
-            <span
-                id="villagersValue"
-                class="hud-stat-value"
-            >
-                — / — / —
+            <span class="villager-counts">
+
+                <span
+                    class="villager-count"
+                    aria-label="Male villagers"
+                    title="Male villagers"
+                >
+                    <span aria-hidden="true">♂</span>
+                    <strong id="maleVillagerCount">0</strong>
+                </span>
+
+                <span class="villager-count-divider">
+                    /
+                </span>
+
+                <span
+                    class="villager-count"
+                    aria-label="Female villagers"
+                    title="Female villagers"
+                >
+                    <span aria-hidden="true">♀</span>
+                    <strong id="femaleVillagerCount">0</strong>
+                </span>
+
+                <span class="villager-count-divider">
+                    /
+                </span>
+
+                <span
+                    class="villager-count villager-count-child"
+                    aria-label="Children"
+                    title="Children"
+                >
+                    <span aria-hidden="true">◇</span>
+                    <strong id="childVillagerCount">0</strong>
+                </span>
+
             </span>
+
         </div>
 
     </header>
@@ -119,23 +168,31 @@
     >
 
         <div
-            id="wildernessLayer"
-            class="wilderness-layer"
-            aria-hidden="true"
-        ></div>
+            id="threeTownMount"
+            class="three-town-mount"
+            aria-label="Three dimensional view of your Hold"
+        >
+
+            <div
+                id="townLoading"
+                class="town-loading"
+            >
+                <span class="town-loading-sigil">
+                    ◇
+                </span>
+
+                <span>
+                    Raising your Hold…
+                </span>
+            </div>
+
+        </div>
 
 
         <div
             class="field-vignette"
             aria-hidden="true"
         ></div>
-
-
-        <section
-            id="town"
-            class="town-zone"
-            aria-label="Your Hold"
-        ></section>
 
 
         <div
@@ -147,6 +204,7 @@
                 class="deploy-slot deploy-slot-1"
                 type="button"
                 data-slot-id="deploy-1"
+                data-slot-number="I"
                 data-card-id=""
                 aria-label="Deployment slot 1"
             >
@@ -155,11 +213,11 @@
                 <span class="deploy-slot-label">Deploy</span>
             </button>
 
-
             <button
                 class="deploy-slot deploy-slot-2"
                 type="button"
                 data-slot-id="deploy-2"
+                data-slot-number="II"
                 data-card-id=""
                 aria-label="Deployment slot 2"
             >
@@ -168,11 +226,11 @@
                 <span class="deploy-slot-label">Deploy</span>
             </button>
 
-
             <button
                 class="deploy-slot deploy-slot-3"
                 type="button"
                 data-slot-id="deploy-3"
+                data-slot-number="III"
                 data-card-id=""
                 aria-label="Deployment slot 3"
             >
@@ -181,11 +239,11 @@
                 <span class="deploy-slot-label">Deploy</span>
             </button>
 
-
             <button
                 class="deploy-slot deploy-slot-4"
                 type="button"
                 data-slot-id="deploy-4"
+                data-slot-number="IV"
                 data-card-id=""
                 aria-label="Deployment slot 4"
             >
@@ -194,11 +252,11 @@
                 <span class="deploy-slot-label">Deploy</span>
             </button>
 
-
             <button
                 class="deploy-slot deploy-slot-5"
                 type="button"
                 data-slot-id="deploy-5"
+                data-slot-number="V"
                 data-card-id=""
                 aria-label="Deployment slot 5"
             >
@@ -207,11 +265,11 @@
                 <span class="deploy-slot-label">Deploy</span>
             </button>
 
-
             <button
                 class="deploy-slot deploy-slot-6"
                 type="button"
                 data-slot-id="deploy-6"
+                data-slot-number="VI"
                 data-card-id=""
                 aria-label="Deployment slot 6"
             >
@@ -220,11 +278,11 @@
                 <span class="deploy-slot-label">Deploy</span>
             </button>
 
-
             <button
                 class="deploy-slot deploy-slot-7"
                 type="button"
                 data-slot-id="deploy-7"
+                data-slot-number="VII"
                 data-card-id=""
                 aria-label="Deployment slot 7"
             >
@@ -233,11 +291,11 @@
                 <span class="deploy-slot-label">Deploy</span>
             </button>
 
-
             <button
                 class="deploy-slot deploy-slot-8"
                 type="button"
                 data-slot-id="deploy-8"
+                data-slot-number="VIII"
                 data-card-id=""
                 aria-label="Deployment slot 8"
             >
