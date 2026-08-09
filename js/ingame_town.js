@@ -1,3 +1,12 @@
+import {
+    VILLAGER_PROFILES
+} from "./villager_profiles.js";
+
+import {
+    getRoutineForVillager,
+    getTownLocation
+} from "./villager_ai.js";
+
 import * as THREE from "three";
 
 
@@ -2788,7 +2797,7 @@ function snapVillagerToNavigation(
         nearest.z;
 
 
-    assignNewVillagerRoute(
+    assignRoutineDestination(
         villager
     );
 
@@ -2798,7 +2807,8 @@ function snapVillagerToNavigation(
 function createHairStyle(
     category,
     headRadius,
-    hairMaterial
+    hairMaterial,
+    requestedStyle = null
 ) {
 
     const hairGroup =
@@ -2826,6 +2836,7 @@ function createHairStyle(
 
 
     const style =
+        requestedStyle ||
         randomChoice(
             category === "male"
                 ? maleStyles
@@ -2988,28 +2999,56 @@ function createHairStyle(
 
 
 function createVillager(
-    id,
-    category
+    profile
 ) {
 
     const group =
         new THREE.Group();
 
+    const id =
+        profile.id;
+
+    const category =
+        profile.ageGroup === "child"
+            ? "child"
+            : profile.gender;
+
+    const appearance =
+        profile.appearance || {};
+
+    const homeLocation =
+        getTownLocation(
+            profile.homeId
+        );
 
     const spawnCell =
-        randomChoice(
-            WALKABLE_CELLS
-        );
+        homeLocation
+            ? findNearestWalkableCell(
+                new THREE.Vector3(
+                    homeLocation.x,
+                    0,
+                    homeLocation.z
+                )
+            )
+            : randomChoice(
+                WALKABLE_CELLS
+            );
 
 
     const child =
-        category === "child";
+        profile.ageGroup === "child";
 
 
     const bodyScale =
-        child
-            ? 0.72
-            : 1;
+        (
+            child
+                ? 0.72
+                : 1
+        ) *
+        (
+            appearance.height ||
+            1
+        );
 
 
     const skin =
@@ -3019,20 +3058,26 @@ function createVillager(
 
     const hair =
         makeMaterial(
-            category === "female"
-                ? 0x3f2d28
-                : category === "male"
-                  ? 0x251d19
-                  : 0x37271f
+            appearance.hairColor ||
+            (
+                category === "female"
+                    ? 0x3f2d28
+                    : category === "male"
+                      ? 0x251d19
+                      : 0x37271f
+            )
         );
 
 
     const clothColor =
-        category === "male"
-            ? PALETTE.maleCloth
-            : category === "female"
-              ? PALETTE.femaleCloth
-              : PALETTE.childCloth;
+        appearance.primaryColor ||
+        (
+            category === "male"
+                ? PALETTE.maleCloth
+                : category === "female"
+                  ? PALETTE.femaleCloth
+                  : PALETTE.childCloth
+        );
 
 
     const cloth =
@@ -3040,11 +3085,20 @@ function createVillager(
             clothColor
         );
 
+    const secondaryCloth =
+        makeMaterial(
+            appearance.secondaryColor ||
+            0x8d8068
+        );
+
     const trouserMaterial =
         makeMaterial(
-            category === "female"
-                ? 0x4f3d4d
-                : 0x383331
+            appearance.trouserColor ||
+            (
+                category === "female"
+                    ? 0x4f3d4d
+                    : 0x383331
+            )
         );
 
     const bootMaterial =
@@ -3057,9 +3111,9 @@ function createVillager(
         new THREE.Mesh(
             category === "female"
                 ? new THREE.CylinderGeometry(
+                    0.29 * bodyScale,
                     0.36 * bodyScale,
-                    0.52 * bodyScale,
-                    1.05 * bodyScale,
+                    0.92 * bodyScale,
                     9
                 )
                 : new THREE.CapsuleGeometry(
@@ -3081,23 +3135,82 @@ function createVillager(
 
     if (category === "female") {
 
-        const skirt =
+        const lowerDress =
             new THREE.Mesh(
                 new THREE.CylinderGeometry(
-                    0.44 * bodyScale,
-                    0.60 * bodyScale,
-                    0.72 * bodyScale,
+                    0.34 * bodyScale,
+                    0.43 * bodyScale,
+                    0.66 * bodyScale,
                     10
                 ),
                 cloth
             );
 
 
-        skirt.position.y =
-            0.76 * bodyScale;
+        lowerDress.position.y =
+            0.73 * bodyScale;
 
 
-        group.add(skirt);
+        group.add(
+            lowerDress
+        );
+
+
+        if (
+            appearance.outfit === "apron" ||
+            appearance.outfit === "villageDress"
+        ) {
+
+            const apron =
+                new THREE.Mesh(
+                    new THREE.BoxGeometry(
+                        0.40 * bodyScale,
+                        0.58 * bodyScale,
+                        0.035 * bodyScale
+                    ),
+                    secondaryCloth
+                );
+
+
+            apron.position.set(
+                0,
+                0.91 * bodyScale,
+                0.37 * bodyScale
+            );
+
+
+            group.add(
+                apron
+            );
+
+        }
+
+    } else if (
+        appearance.outfit === "farmerVest"
+    ) {
+
+        const vest =
+            new THREE.Mesh(
+                new THREE.BoxGeometry(
+                    0.48 * bodyScale,
+                    0.55 * bodyScale,
+                    0.06 * bodyScale
+                ),
+                secondaryCloth
+            );
+
+
+        vest.position.set(
+            0,
+            1.38 * bodyScale,
+            0.31 * bodyScale
+        );
+
+
+        group.add(
+            vest
+        );
+
     }
 
 
@@ -3146,7 +3259,8 @@ function createVillager(
         createHairStyle(
             category,
             headRadius,
-            hair
+            hair,
+            appearance.hairStyle
         );
 
 
@@ -3329,6 +3443,14 @@ function createVillager(
     group.userData = {
         id,
         category,
+        profile,
+        personality:
+            profile.personality,
+        routine:
+            getRoutineForVillager(
+                profile
+            ),
+        routineIndex: 0,
 
         speed:
             child
@@ -3411,31 +3533,13 @@ function createVillagers(
     scene
 ) {
 
-    const categories = [
-        "male",
-        "female",
-        "male",
-        "child",
-        "female",
-        "male",
-        "female",
-        "child",
-        "female",
-        "male"
-    ];
-
-
     const villagers =
-        categories.map(
-            (
-                category,
-                index
-            ) => {
+        VILLAGER_PROFILES.map(
+            (profile) => {
 
                 const villager =
                     createVillager(
-                        `villager-${index + 1}`,
-                        category
+                        profile
                     );
 
 
@@ -3455,177 +3559,132 @@ function createVillagers(
 }
 
 
-function keepOutsideBuildingObstacles(
-    position
+function assignRoutineDestination(
+    villager
 ) {
 
-    BUILDING_OBSTACLES.forEach(
-        (obstacle) => {
-
-            const margin =
-                0.6;
-
-            const minX =
-                obstacle.x -
-                obstacle.w / 2 -
-                margin;
-
-            const maxX =
-                obstacle.x +
-                obstacle.w / 2 +
-                margin;
-
-            const minZ =
-                obstacle.z -
-                obstacle.d / 2 -
-                margin;
-
-            const maxZ =
-                obstacle.z +
-                obstacle.d / 2 +
-                margin;
+    const data =
+        villager.userData;
 
 
-            const inside =
-                position.x >
-                    minX &&
-                position.x <
-                    maxX &&
-                position.z >
-                    minZ &&
-                position.z <
-                    maxZ;
+    if (
+        !data.routine?.length
+    ) {
+
+        assignNewVillagerRoute(
+            villager
+        );
+
+        return;
+    }
 
 
-            if (!inside) {
-                return;
-            }
+    const locationId =
+        data.routine[
+            data.routineIndex %
+            data.routine.length
+        ];
 
 
-            const leftDist =
-                position.x -
-                minX;
-
-            const rightDist =
-                maxX -
-                position.x;
-
-            const topDist =
-                position.z -
-                minZ;
-
-            const bottomDist =
-                maxZ -
-                position.z;
+    data.routineIndex =
+        (
+            data.routineIndex +
+            1
+        ) %
+        data.routine.length;
 
 
-            const nearest =
-                Math.min(
-                    leftDist,
-                    rightDist,
-                    topDist,
-                    bottomDist
-                );
+    const location =
+        getTownLocation(
+            locationId
+        );
 
 
-            if (
-                nearest ===
-                leftDist
-            ) {
+    if (!location) {
 
-                position.x =
-                    minX;
+        assignNewVillagerRoute(
+            villager
+        );
 
-            } else if (
-                nearest ===
-                rightDist
-            ) {
-
-                position.x =
-                    maxX;
-
-            } else if (
-                nearest ===
-                topDist
-            ) {
-
-                position.z =
-                    minZ;
-
-            } else {
-
-                position.z =
-                    maxZ;
-
-            }
-
-        }
-    );
-
-}
+        return;
+    }
 
 
-function keepOutsideCircularObstacles(
-    position
-) {
-
-    CIRCULAR_OBSTACLES.forEach(
-        (obstacle) => {
-
-            const dx =
-                position.x -
-                obstacle.x;
-
-            const dz =
-                position.z -
-                obstacle.z;
-
-            const safeRadius =
-                obstacle.radius +
-                0.5;
-
-            const distanceSquared =
-                dx * dx +
-                dz * dz;
+    const startCell =
+        findNearestWalkableCell(
+            villager.position
+        );
 
 
-            if (
-                distanceSquared >=
-                safeRadius *
-                safeRadius
-            ) {
-                return;
-            }
+    const goalCell =
+        findNearestWalkableCell(
+            new THREE.Vector3(
+                location.x,
+                0,
+                location.z
+            )
+        );
 
 
-            const distance =
-                Math.max(
-                    Math.sqrt(
-                        distanceSquared
-                    ),
-                    0.001
-                );
-
-            const nx =
-                dx /
-                distance;
-
-            const nz =
-                dz /
-                distance;
+    const rawPath =
+        findGridPath(
+            startCell,
+            goalCell
+        );
 
 
-            position.x =
-                obstacle.x +
-                nx *
-                safeRadius;
+    if (
+        rawPath.length <
+        2
+    ) {
 
-            position.z =
-                obstacle.z +
-                nz *
-                safeRadius;
+        assignNewVillagerRoute(
+            villager
+        );
 
-        }
+        return;
+    }
+
+
+    const path =
+        simplifyGridPath(
+            rawPath
+        );
+
+
+    data.pathPoints =
+        path
+            .slice(1)
+            .map(
+                (
+                    cell,
+                    index
+                ) => {
+
+                    return makePathPoint(
+                        cell,
+                        data.laneSeed,
+                        index ===
+                        path.length -
+                        2
+                    );
+
+                }
+            );
+
+
+    data.pathIndex =
+        0;
+
+    data.target =
+        data.pathPoints[0];
+
+    data.stuckTime =
+        0;
+
+    data.lastXZ.set(
+        villager.position.x,
+        villager.position.z
     );
 
 }
@@ -3649,7 +3708,7 @@ function updateVillagers(
                 !data.pathPoints?.length
             ) {
 
-                assignNewVillagerRoute(
+                assignRoutineDestination(
                     villager
                 );
 
@@ -3690,7 +3749,7 @@ function updateVillagers(
                     data.pathPoints.length
                 ) {
 
-                    assignNewVillagerRoute(
+                    assignRoutineDestination(
                         villager
                     );
 
