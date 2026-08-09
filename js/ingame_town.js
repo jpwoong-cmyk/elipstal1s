@@ -54,147 +54,35 @@ const CIRCULAR_OBSTACLES = [
 
 
 /* ============================================================
-   WALKABLE TOWN NETWORK
+   WALKABLE TOWN NAVIGATION GRID
    ------------------------------------------------------------
-   Villagers now travel along explicit town paths instead of
-   choosing arbitrary points and attempting to dodge assets.
-   Buildings/well collision remain as a final safety layer.
+   Villagers use A* pathfinding across a navigation grid.
+   Buildings and the well are removed from the walkable cells,
+   so routes are calculated around them before movement begins.
 ============================================================ */
 
-const WALK_NODES = {
-    northGate:       { x: 0.0,  z: -12.0 },
-    northMid:        { x: 0.0,  z: -8.7 },
+const NAVIGATION = {
+    minX: -15,
+    maxX: 15,
+    minZ: -12.5,
+    maxZ: 12.5,
 
-    northWestLane:   { x: -3.3, z: -2.5 },
-    northEastLane:   { x: 3.3,  z: -2.5 },
+    cellSize: 0.85,
 
-    westGate:        { x: -12.0, z: 0.0 },
-    westMid:         { x: -8.8,  z: 0.0 },
+    /*
+     * Keeps wandering focused around the visible town rather
+     * than sending villagers deep into the wilderness.
+     */
+    ellipseRadiusX: 14.5,
+    ellipseRadiusZ: 11.8,
 
-    wellWestNorth:   { x: -3.4, z: -0.7 },
-    wellWestSouth:   { x: -3.4, z: 3.1 },
-
-    wellEastNorth:   { x: 3.4,  z: -0.7 },
-    wellEastSouth:   { x: 3.4,  z: 3.1 },
-
-    eastMid:         { x: 8.8,  z: 0.0 },
-    eastGate:        { x: 12.0, z: 0.0 },
-
-    southWestLane:   { x: -3.4, z: 5.0 },
-    southEastLane:   { x: 3.4,  z: 5.0 },
-
-    southMid:        { x: 0.0,  z: 8.5 },
-    southGate:       { x: 0.0,  z: 11.5 },
-
-    farmTurn:        { x: 6.3,  z: 4.8 },
-    farmApproach:    { x: 8.8,  z: 6.3 }
+    buildingMargin: 0.95,
+    wellMargin: 0.75
 };
 
 
-const WALK_LINKS = {
-    northGate: [
-        "northMid"
-    ],
-
-    northMid: [
-        "northGate",
-        "northWestLane",
-        "northEastLane"
-    ],
-
-    northWestLane: [
-        "northMid",
-        "wellWestNorth"
-    ],
-
-    northEastLane: [
-        "northMid",
-        "wellEastNorth"
-    ],
-
-    westGate: [
-        "westMid"
-    ],
-
-    westMid: [
-        "westGate",
-        "wellWestNorth",
-        "wellWestSouth"
-    ],
-
-    wellWestNorth: [
-        "northWestLane",
-        "westMid",
-        "wellWestSouth"
-    ],
-
-    wellWestSouth: [
-        "wellWestNorth",
-        "westMid",
-        "southWestLane"
-    ],
-
-    wellEastNorth: [
-        "northEastLane",
-        "eastMid",
-        "wellEastSouth"
-    ],
-
-    wellEastSouth: [
-        "wellEastNorth",
-        "eastMid",
-        "southEastLane",
-        "farmTurn"
-    ],
-
-    eastMid: [
-        "wellEastNorth",
-        "wellEastSouth",
-        "eastGate"
-    ],
-
-    eastGate: [
-        "eastMid"
-    ],
-
-    southWestLane: [
-        "wellWestSouth",
-        "southMid"
-    ],
-
-    southEastLane: [
-        "wellEastSouth",
-        "southMid",
-        "farmTurn"
-    ],
-
-    southMid: [
-        "southWestLane",
-        "southEastLane",
-        "southGate"
-    ],
-
-    southGate: [
-        "southMid"
-    ],
-
-    farmTurn: [
-        "wellEastSouth",
-        "southEastLane",
-        "farmApproach"
-    ],
-
-    farmApproach: [
-        "farmTurn"
-    ]
-};
-
-
-const WALK_NODE_IDS =
-    Object.keys(
-        WALK_NODES
-    );
-
+let NAV_GRID = null;
+let WALKABLE_CELLS = [];
 
 
 function seededRandom(seed = 0xEC1A17) {
@@ -1765,138 +1653,788 @@ function isInsideObstacle(
 }
 
 
-function getWalkNodeVector(
-    nodeId
+function navKey(
+    col,
+    row
 ) {
 
-    const node =
-        WALK_NODES[
-            nodeId
-        ];
+    return `${col},${row}`;
 
+}
+
+
+function worldToGrid(
+    x,
+    z
+) {
+
+    return {
+        col:
+            Math.round(
+                (
+                    x -
+                    NAVIGATION.minX
+                ) /
+                NAVIGATION.cellSize
+            ),
+
+        row:
+            Math.round(
+                (
+                    z -
+                    NAVIGATION.minZ
+                ) /
+                NAVIGATION.cellSize
+            )
+    };
+
+}
+
+
+function gridToWorld(
+    col,
+    row
+) {
 
     return new THREE.Vector3(
-        node.x,
+        NAVIGATION.minX +
+            col *
+            NAVIGATION.cellSize,
         0,
-        node.z
+        NAVIGATION.minZ +
+            row *
+            NAVIGATION.cellSize
     );
 
 }
 
 
-function getNearestWalkNodeId(
+function isInsideTownWalkArea(
+    x,
+    z
+) {
+
+    const nx =
+        x /
+        NAVIGATION.ellipseRadiusX;
+
+    const nz =
+        (
+            z -
+            0.6
+        ) /
+        NAVIGATION.ellipseRadiusZ;
+
+
+    return (
+        nx * nx +
+        nz * nz
+    ) <=
+    1;
+
+}
+
+
+function isInsideBuildingNavigationBlock(
+    x,
+    z
+) {
+
+    return BUILDING_OBSTACLES.some(
+        (obstacle) => {
+
+            return (
+                Math.abs(
+                    x -
+                    obstacle.x
+                ) <=
+                obstacle.w /
+                2 +
+                NAVIGATION.buildingMargin &&
+                Math.abs(
+                    z -
+                    obstacle.z
+                ) <=
+                obstacle.d /
+                2 +
+                NAVIGATION.buildingMargin
+            );
+
+        }
+    );
+
+}
+
+
+function isInsideCircularNavigationBlock(
+    x,
+    z
+) {
+
+    return CIRCULAR_OBSTACLES.some(
+        (obstacle) => {
+
+            const dx =
+                x -
+                obstacle.x;
+
+            const dz =
+                z -
+                obstacle.z;
+
+            const radius =
+                obstacle.radius +
+                NAVIGATION.wellMargin;
+
+
+            return (
+                dx * dx +
+                dz * dz
+            ) <=
+            radius *
+            radius;
+
+        }
+    );
+
+}
+
+
+function isNavigationPointWalkable(
+    x,
+    z
+) {
+
+    return (
+        isInsideTownWalkArea(
+            x,
+            z
+        ) &&
+        !isInsideBuildingNavigationBlock(
+            x,
+            z
+        ) &&
+        !isInsideCircularNavigationBlock(
+            x,
+            z
+        )
+    );
+
+}
+
+
+function buildNavigationGrid() {
+
+    const cols =
+        Math.floor(
+            (
+                NAVIGATION.maxX -
+                NAVIGATION.minX
+            ) /
+            NAVIGATION.cellSize
+        ) +
+        1;
+
+    const rows =
+        Math.floor(
+            (
+                NAVIGATION.maxZ -
+                NAVIGATION.minZ
+            ) /
+            NAVIGATION.cellSize
+        ) +
+        1;
+
+
+    const cells =
+        new Map();
+
+    const walkableCells =
+        [];
+
+
+    for (
+        let row = 0;
+        row < rows;
+        row += 1
+    ) {
+
+        for (
+            let col = 0;
+            col < cols;
+            col += 1
+        ) {
+
+            const world =
+                gridToWorld(
+                    col,
+                    row
+                );
+
+
+            const walkable =
+                isNavigationPointWalkable(
+                    world.x,
+                    world.z
+                );
+
+
+            const cell = {
+                col,
+                row,
+                x: world.x,
+                z: world.z,
+                walkable
+            };
+
+
+            cells.set(
+                navKey(
+                    col,
+                    row
+                ),
+                cell
+            );
+
+
+            if (walkable) {
+                walkableCells.push(
+                    cell
+                );
+            }
+
+        }
+
+    }
+
+
+    NAV_GRID = {
+        cols,
+        rows,
+        cells
+    };
+
+
+    WALKABLE_CELLS =
+        walkableCells;
+
+}
+
+
+function getNavCell(
+    col,
+    row
+) {
+
+    if (!NAV_GRID) {
+        return null;
+    }
+
+
+    return NAV_GRID.cells.get(
+        navKey(
+            col,
+            row
+        )
+    ) ||
+    null;
+
+}
+
+
+function findNearestWalkableCell(
     position
 ) {
 
-    let nearestId =
-        WALK_NODE_IDS[0];
-
-    let nearestDistance =
-        Infinity;
+    if (!NAV_GRID) {
+        return null;
+    }
 
 
-    WALK_NODE_IDS.forEach(
-        (nodeId) => {
-
-            const node =
-                WALK_NODES[
-                    nodeId
-                ];
+    const start =
+        worldToGrid(
+            position.x,
+            position.z
+        );
 
 
-            const dx =
-                position.x -
-                node.x;
-
-            const dz =
-                position.z -
-                node.z;
-
-            const distance =
-                dx * dx +
-                dz * dz;
+    const direct =
+        getNavCell(
+            start.col,
+            start.row
+        );
 
 
-            if (
-                distance <
-                nearestDistance
+    if (
+        direct?.walkable
+    ) {
+        return direct;
+    }
+
+
+    for (
+        let radius = 1;
+        radius <= 8;
+        radius += 1
+    ) {
+
+        let bestCell =
+            null;
+
+        let bestDistance =
+            Infinity;
+
+
+        for (
+            let row =
+                start.row -
+                radius;
+            row <=
+                start.row +
+                radius;
+            row += 1
+        ) {
+
+            for (
+                let col =
+                    start.col -
+                    radius;
+                col <=
+                    start.col +
+                    radius;
+                col += 1
             ) {
 
-                nearestDistance =
-                    distance;
+                if (
+                    Math.abs(
+                        col -
+                        start.col
+                    ) !==
+                    radius &&
+                    Math.abs(
+                        row -
+                        start.row
+                    ) !==
+                    radius
+                ) {
+                    continue;
+                }
 
-                nearestId =
-                    nodeId;
+
+                const cell =
+                    getNavCell(
+                        col,
+                        row
+                    );
+
+
+                if (
+                    !cell?.walkable
+                ) {
+                    continue;
+                }
+
+
+                const dx =
+                    position.x -
+                    cell.x;
+
+                const dz =
+                    position.z -
+                    cell.z;
+
+                const distance =
+                    dx * dx +
+                    dz * dz;
+
+
+                if (
+                    distance <
+                    bestDistance
+                ) {
+
+                    bestDistance =
+                        distance;
+
+                    bestCell =
+                        cell;
+
+                }
 
             }
 
         }
-    );
 
 
-    return nearestId;
+        if (bestCell) {
+            return bestCell;
+        }
+
+    }
+
+
+    return null;
 
 }
 
 
-function findWalkRoute(
-    startId,
-    destinationId
+function canMoveDiagonal(
+    fromCol,
+    fromRow,
+    toCol,
+    toRow
+) {
+
+    const dx =
+        toCol -
+        fromCol;
+
+    const dz =
+        toRow -
+        fromRow;
+
+
+    if (
+        Math.abs(
+            dx
+        ) !==
+        1 ||
+        Math.abs(
+            dz
+        ) !==
+        1
+    ) {
+        return true;
+    }
+
+
+    const horizontal =
+        getNavCell(
+            fromCol +
+            dx,
+            fromRow
+        );
+
+    const vertical =
+        getNavCell(
+            fromCol,
+            fromRow +
+            dz
+        );
+
+
+    return Boolean(
+        horizontal?.walkable &&
+        vertical?.walkable
+    );
+
+}
+
+
+function getWalkableNeighbours(
+    cell
+) {
+
+    const neighbours =
+        [];
+
+
+    const offsets = [
+        [-1, 0],
+        [1, 0],
+        [0, -1],
+        [0, 1],
+
+        [-1, -1],
+        [1, -1],
+        [-1, 1],
+        [1, 1]
+    ];
+
+
+    offsets.forEach(
+        (
+            [
+                dc,
+                dr
+            ]
+        ) => {
+
+            const neighbour =
+                getNavCell(
+                    cell.col +
+                    dc,
+                    cell.row +
+                    dr
+                );
+
+
+            if (
+                !neighbour?.walkable
+            ) {
+                return;
+            }
+
+
+            if (
+                !canMoveDiagonal(
+                    cell.col,
+                    cell.row,
+                    neighbour.col,
+                    neighbour.row
+                )
+            ) {
+                return;
+            }
+
+
+            neighbours.push(
+                neighbour
+            );
+
+        }
+    );
+
+
+    return neighbours;
+
+}
+
+
+function heuristic(
+    a,
+    b
+) {
+
+    return Math.hypot(
+        a.col -
+        b.col,
+        a.row -
+        b.row
+    );
+
+}
+
+
+function findGridPath(
+    startCell,
+    goalCell
 ) {
 
     if (
-        startId ===
-        destinationId
+        !startCell ||
+        !goalCell
+    ) {
+        return [];
+    }
+
+
+    if (
+        startCell ===
+        goalCell
     ) {
         return [
-            startId
+            startCell
         ];
     }
 
 
-    const queue = [
-        startId
-    ];
+    const open =
+        new Map();
 
     const cameFrom =
         new Map();
 
+    const gScore =
+        new Map();
 
-    cameFrom.set(
-        startId,
-        null
+    const fScore =
+        new Map();
+
+
+    const startKey =
+        navKey(
+            startCell.col,
+            startCell.row
+        );
+
+
+    open.set(
+        startKey,
+        startCell
+    );
+
+    gScore.set(
+        startKey,
+        0
+    );
+
+    fScore.set(
+        startKey,
+        heuristic(
+            startCell,
+            goalCell
+        )
     );
 
 
     while (
-        queue.length
+        open.size
     ) {
 
-        const current =
-            queue.shift();
+        let currentKey =
+            null;
+
+        let current =
+            null;
+
+        let lowestScore =
+            Infinity;
 
 
-        if (
-            current ===
-            destinationId
-        ) {
+        open.forEach(
+            (
+                cell,
+                key
+            ) => {
+
+                const score =
+                    fScore.get(
+                        key
+                    ) ??
+                    Infinity;
+
+
+                if (
+                    score <
+                    lowestScore
+                ) {
+
+                    lowestScore =
+                        score;
+
+                    currentKey =
+                        key;
+
+                    current =
+                        cell;
+
+                }
+
+            }
+        );
+
+
+        if (!current) {
             break;
         }
 
 
-        const neighbours =
-            WALK_LINKS[
+        if (
+            current.col ===
+            goalCell.col &&
+            current.row ===
+            goalCell.row
+        ) {
+
+            const path = [
                 current
-            ] ||
-            [];
+            ];
+
+            let cursorKey =
+                currentKey;
 
 
-        neighbours.forEach(
+            while (
+                cameFrom.has(
+                    cursorKey
+                )
+            ) {
+
+                cursorKey =
+                    cameFrom.get(
+                        cursorKey
+                    );
+
+
+                const [
+                    col,
+                    row
+                ] =
+                    cursorKey
+                        .split(",")
+                        .map(Number);
+
+
+                const cell =
+                    getNavCell(
+                        col,
+                        row
+                    );
+
+
+                if (cell) {
+                    path.push(
+                        cell
+                    );
+                }
+
+            }
+
+
+            path.reverse();
+
+
+            return path;
+
+        }
+
+
+        open.delete(
+            currentKey
+        );
+
+
+        getWalkableNeighbours(
+            current
+        ).forEach(
             (neighbour) => {
 
+                const neighbourKey =
+                    navKey(
+                        neighbour.col,
+                        neighbour.row
+                    );
+
+
+                const diagonal =
+                    neighbour.col !==
+                    current.col &&
+                    neighbour.row !==
+                    current.row;
+
+
+                const tentative =
+                    (
+                        gScore.get(
+                            currentKey
+                        ) ??
+                        Infinity
+                    ) +
+                    (
+                        diagonal
+                            ? 1.414
+                            : 1
+                    );
+
+
                 if (
-                    cameFrom.has(
-                        neighbour
+                    tentative >=
+                    (
+                        gScore.get(
+                            neighbourKey
+                        ) ??
+                        Infinity
                     )
                 ) {
                     return;
@@ -1904,12 +2442,29 @@ function findWalkRoute(
 
 
                 cameFrom.set(
-                    neighbour,
-                    current
+                    neighbourKey,
+                    currentKey
                 );
 
 
-                queue.push(
+                gScore.set(
+                    neighbourKey,
+                    tentative
+                );
+
+
+                fScore.set(
+                    neighbourKey,
+                    tentative +
+                    heuristic(
+                        neighbour,
+                        goalCell
+                    )
+                );
+
+
+                open.set(
+                    neighbourKey,
                     neighbour
                 );
 
@@ -1919,206 +2474,193 @@ function findWalkRoute(
     }
 
 
-    if (
-        !cameFrom.has(
-            destinationId
-        )
-    ) {
-
-        return [
-            startId
-        ];
-
-    }
-
-
-    const route = [];
-
-    let current =
-        destinationId;
-
-
-    while (
-        current !==
-        null
-    ) {
-
-        route.push(
-            current
-        );
-
-
-        current =
-            cameFrom.get(
-                current
-            );
-
-    }
-
-
-    route.reverse();
-
-
-    return route;
+    return [];
 
 }
 
 
-function chooseDifferentWalkNode(
-    currentId
+function simplifyGridPath(
+    cells
 ) {
 
     if (
-        WALK_NODE_IDS.length <
+        cells.length <=
         2
     ) {
-        return currentId;
+        return cells;
     }
 
 
-    let nextId =
-        currentId;
+    const simplified = [
+        cells[0]
+    ];
+
+
+    let previousDirection =
+        null;
+
+
+    for (
+        let index = 1;
+        index <
+        cells.length;
+        index += 1
+    ) {
+
+        const previous =
+            cells[
+                index -
+                1
+            ];
+
+        const current =
+            cells[
+                index
+            ];
+
+
+        const dc =
+            Math.sign(
+                current.col -
+                previous.col
+            );
+
+        const dr =
+            Math.sign(
+                current.row -
+                previous.row
+            );
+
+
+        const direction =
+            `${dc},${dr}`;
+
+
+        if (
+            previousDirection !==
+            null &&
+            direction !==
+            previousDirection
+        ) {
+
+            simplified.push(
+                previous
+            );
+
+        }
+
+
+        previousDirection =
+            direction;
+
+    }
+
+
+    simplified.push(
+        cells[
+            cells.length -
+            1
+        ]
+    );
+
+
+    return simplified;
+
+}
+
+
+function chooseRandomWalkableCell(
+    currentCell
+) {
+
+    if (
+        !WALKABLE_CELLS.length
+    ) {
+        return currentCell;
+    }
+
+
+    let selected =
+        currentCell;
 
 
     for (
         let attempt = 0;
-        attempt < 20;
+        attempt < 50;
         attempt += 1
     ) {
 
-        nextId =
+        const candidate =
             randomChoice(
-                WALK_NODE_IDS
+                WALKABLE_CELLS
             );
 
 
         if (
-            nextId !==
-            currentId
+            !currentCell
         ) {
+            return candidate;
+        }
+
+
+        const distance =
+            Math.hypot(
+                candidate.x -
+                currentCell.x,
+                candidate.z -
+                currentCell.z
+            );
+
+
+        /*
+         * Prefer meaningful journeys instead of
+         * tiny one-cell shuffles.
+         */
+
+        if (
+            distance >
+            4.0
+        ) {
+
+            selected =
+                candidate;
+
             break;
+
         }
 
     }
 
 
-    return nextId;
-
+    return selected;
 }
 
 
-function createNodeTarget(
-    nodeId,
-    laneSeed
+function makePathPoint(
+    cell,
+    laneSeed,
+    isDestination = false
 ) {
 
-    const node =
-        WALK_NODES[
-            nodeId
-        ];
-
-
-    /*
-     * A small fixed lane offset prevents villagers
-     * from forming one perfect single-file line.
-     */
-
-    const laneAmount =
+    const lane =
         (
             laneSeed -
             0.5
         ) *
-        0.5;
-
-
-    let x =
-        node.x;
-
-    let z =
-        node.z;
-
-
-    const links =
-        WALK_LINKS[
-            nodeId
-        ] ||
-        [];
-
-
-    if (
-        links.length
-    ) {
-
-        const neighbour =
-            WALK_NODES[
-                links[0]
-            ];
-
-
-        const dx =
-            neighbour.x -
-            node.x;
-
-        const dz =
-            neighbour.z -
-            node.z;
-
-        const length =
-            Math.max(
-                Math.hypot(
-                    dx,
-                    dz
-                ),
-                0.001
-            );
-
-
-        /*
-         * Perpendicular lane offset.
-         */
-
-        x +=
-            (
-                -dz /
-                length
-            ) *
-            laneAmount;
-
-        z +=
-            (
-                dx /
-                length
-            ) *
-            laneAmount;
-
-    }
-
-
-    /*
-     * Never allow the offset itself to put a waypoint
-     * inside a solid town asset.
-     */
-
-    if (
-        isInsideObstacle(
-            x,
-            z
-        )
-    ) {
-
-        x =
-            node.x;
-
-        z =
-            node.z;
-
-    }
+        (
+            isDestination
+                ? 0.38
+                : 0.22
+        );
 
 
     return new THREE.Vector3(
-        x,
+        cell.x +
+            lane,
         0,
-        z
+        cell.z -
+            lane *
+            0.5
     );
 
 }
@@ -2132,44 +2674,123 @@ function assignNewVillagerRoute(
         villager.userData;
 
 
-    const startId =
-        getNearestWalkNodeId(
+    const startCell =
+        findNearestWalkableCell(
             villager.position
         );
 
 
-    const destinationId =
-        chooseDifferentWalkNode(
-            startId
+    if (!startCell) {
+        return;
+    }
+
+
+    const destination =
+        chooseRandomWalkableCell(
+            startCell
         );
 
 
-    const route =
-        findWalkRoute(
-            startId,
-            destinationId
+    const rawPath =
+        findGridPath(
+            startCell,
+            destination
         );
 
 
-    data.route =
-        route;
+    if (
+        rawPath.length <
+        2
+    ) {
 
-    data.routeIndex =
-        route.length >
-        1
-            ? 1
-            : 0;
+        data.pathPoints = [
+            makePathPoint(
+                startCell,
+                data.laneSeed
+            )
+        ];
 
-    data.destinationNodeId =
-        destinationId;
+        data.pathIndex = 0;
+
+        data.target =
+            data.pathPoints[0];
+
+        return;
+    }
+
+
+    const path =
+        simplifyGridPath(
+            rawPath
+        );
+
+
+    data.pathPoints =
+        path
+            .slice(1)
+            .map(
+                (
+                    cell,
+                    index
+                ) => {
+
+                    return makePathPoint(
+                        cell,
+                        data.laneSeed,
+                        index ===
+                        path.length -
+                        2
+                    );
+
+                }
+            );
+
+
+    data.pathIndex =
+        0;
+
 
     data.target =
-        createNodeTarget(
-            route[
-                data.routeIndex
-            ],
-            data.laneSeed
+        data.pathPoints[0];
+
+
+    data.stuckTime =
+        0;
+
+    data.lastXZ =
+        new THREE.Vector2(
+            villager.position.x,
+            villager.position.z
         );
+
+}
+
+
+function snapVillagerToNavigation(
+    villager
+) {
+
+    const nearest =
+        findNearestWalkableCell(
+            villager.position
+        );
+
+
+    if (!nearest) {
+        return;
+    }
+
+
+    villager.position.x =
+        nearest.x;
+
+    villager.position.z =
+        nearest.z;
+
+
+    assignNewVillagerRoute(
+        villager
+    );
 
 }
 
@@ -2183,9 +2804,9 @@ function createVillager(
         new THREE.Group();
 
 
-    const spawnNodeId =
+    const spawnCell =
         randomChoice(
-            WALK_NODE_IDS
+            WALKABLE_CELLS
         );
 
 
@@ -2215,15 +2836,13 @@ function createVillager(
         laneSeed:
             random(),
 
-        route: [],
-        routeIndex: 0,
-        destinationNodeId:
-            spawnNodeId,
+        pathPoints: [],
+        pathIndex: 0,
+        target: null,
 
-        target:
-            getWalkNodeVector(
-                spawnNodeId
-            )
+        stuckTime: 0,
+        lastXZ:
+            new THREE.Vector2()
     };
 
 
@@ -2439,10 +3058,10 @@ function createVillager(
     );
 
 
-    group.position.copy(
-        getWalkNodeVector(
-            spawnNodeId
-        )
+    group.position.set(
+        spawnCell.x,
+        0,
+        spawnCell.z
     );
 
 
@@ -2701,13 +3320,19 @@ function updateVillagers(
 
 
             if (
-                !data.target
+                !data.target ||
+                !data.pathPoints?.length
             ) {
 
                 assignNewVillagerRoute(
                     villager
                 );
 
+            }
+
+
+            if (!data.target) {
+                return;
             }
 
 
@@ -2720,21 +3345,24 @@ function updateVillagers(
 
 
             const distance =
-                toTarget.length();
+                Math.hypot(
+                    toTarget.x,
+                    toTarget.z
+                );
 
 
             if (
                 distance <
-                0.34
+                0.28
             ) {
 
-                data.routeIndex +=
+                data.pathIndex +=
                     1;
 
 
                 if (
-                    data.routeIndex >=
-                    data.route.length
+                    data.pathIndex >=
+                    data.pathPoints.length
                 ) {
 
                     assignNewVillagerRoute(
@@ -2744,12 +3372,9 @@ function updateVillagers(
                 } else {
 
                     data.target =
-                        createNodeTarget(
-                            data.route[
-                                data.routeIndex
-                            ],
-                            data.laneSeed
-                        );
+                        data.pathPoints[
+                            data.pathIndex
+                        ];
 
                 }
 
@@ -2758,77 +3383,105 @@ function updateVillagers(
             }
 
 
-            const moveDirection =
-                toTarget.normalize();
+            toTarget.y = 0;
+
+            toTarget.normalize();
 
 
-            const nextPosition =
-                villager.position
-                    .clone()
-                    .addScaledVector(
-                        moveDirection,
-                        data.speed *
-                        delta
-                    );
+            const step =
+                data.speed *
+                delta;
+
+
+            villager.position.x +=
+                toTarget.x *
+                step;
+
+            villager.position.z +=
+                toTarget.z *
+                step;
 
 
             /*
-             * The route network is the primary movement logic.
-             * These are only fail-safe collision clamps.
+             * Collision is only an emergency safety net.
+             * The A* route itself should already avoid assets.
              */
 
             keepOutsideBuildingObstacles(
-                nextPosition
+                villager.position
             );
 
 
             keepOutsideCircularObstacles(
-                nextPosition
+                villager.position
             );
 
 
-            /*
-             * If a clamp significantly moved the villager,
-             * snap their route back to the nearest safe node.
-             * This avoids endless edge-sticking.
-             */
-
-            const movedByClamp =
-                nextPosition.distanceTo(
-                    villager.position
-                        .clone()
-                        .addScaledVector(
-                            moveDirection,
-                            data.speed *
-                            delta
-                        )
+            villager.rotation.y =
+                Math.atan2(
+                    toTarget.x,
+                    toTarget.z
                 );
 
 
-            villager.position.x =
-                nextPosition.x;
+            /*
+             * Stuck watchdog.
+             *
+             * If a villager barely changes X/Z for more than
+             * 1.25 seconds, move them to the nearest valid
+             * navigation cell and calculate a completely new
+             * route. This prevents permanent edge-locking.
+             */
 
-            villager.position.z =
-                nextPosition.z;
+            const currentXZ =
+                new THREE.Vector2(
+                    villager.position.x,
+                    villager.position.z
+                );
+
+
+            const moved =
+                currentXZ.distanceTo(
+                    data.lastXZ
+                );
 
 
             if (
-                movedByClamp >
-                0.18
+                moved <
+                0.008
             ) {
 
-                assignNewVillagerRoute(
-                    villager
+                data.stuckTime +=
+                    delta;
+
+            } else {
+
+                data.stuckTime =
+                    Math.max(
+                        0,
+                        data.stuckTime -
+                        delta *
+                        2
+                    );
+
+                data.lastXZ.copy(
+                    currentXZ
                 );
 
             }
 
 
-            villager.rotation.y =
-                Math.atan2(
-                    moveDirection.x,
-                    moveDirection.z
+            if (
+                data.stuckTime >
+                1.25
+            ) {
+
+                snapVillagerToNavigation(
+                    villager
                 );
+
+                return;
+            }
 
 
             villager.position.y =
@@ -3156,6 +3809,9 @@ export function createTownScene(
     createLights(
         scene
     );
+
+
+    buildNavigationGrid();
 
 
     const villagers =
