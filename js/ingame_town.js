@@ -1994,6 +1994,368 @@ function createVillagers(
 }
 
 
+function avoidBuildingObstacles(
+    villager,
+    desiredDirection
+) {
+
+    const avoidance =
+        new THREE.Vector3();
+
+
+    BUILDING_OBSTACLES.forEach(
+        (obstacle) => {
+
+            const margin =
+                0.65;
+
+            const awareness =
+                2.3;
+
+            const minX =
+                obstacle.x -
+                obstacle.w / 2 -
+                margin;
+
+            const maxX =
+                obstacle.x +
+                obstacle.w / 2 +
+                margin;
+
+            const minZ =
+                obstacle.z -
+                obstacle.d / 2 -
+                margin;
+
+            const maxZ =
+                obstacle.z +
+                obstacle.d / 2 +
+                margin;
+
+
+            const closestX =
+                Math.max(
+                    minX,
+                    Math.min(
+                        villager.position.x,
+                        maxX
+                    )
+                );
+
+            const closestZ =
+                Math.max(
+                    minZ,
+                    Math.min(
+                        villager.position.z,
+                        maxZ
+                    )
+                );
+
+
+            const away =
+                new THREE.Vector3(
+                    villager.position.x -
+                        closestX,
+                    0,
+                    villager.position.z -
+                        closestZ
+                );
+
+
+            const distance =
+                away.length();
+
+
+            /*
+             * If the villager is somehow already inside
+             * the building collision box, push them toward
+             * the nearest edge immediately.
+             */
+
+            const inside =
+                villager.position.x >
+                    minX &&
+                villager.position.x <
+                    maxX &&
+                villager.position.z >
+                    minZ &&
+                villager.position.z <
+                    maxZ;
+
+
+            if (inside) {
+
+                const leftDist =
+                    villager.position.x -
+                    minX;
+
+                const rightDist =
+                    maxX -
+                    villager.position.x;
+
+                const topDist =
+                    villager.position.z -
+                    minZ;
+
+                const bottomDist =
+                    maxZ -
+                    villager.position.z;
+
+
+                const nearest =
+                    Math.min(
+                        leftDist,
+                        rightDist,
+                        topDist,
+                        bottomDist
+                    );
+
+
+                if (
+                    nearest ===
+                    leftDist
+                ) {
+
+                    avoidance.x -=
+                        4.0;
+
+                } else if (
+                    nearest ===
+                    rightDist
+                ) {
+
+                    avoidance.x +=
+                        4.0;
+
+                } else if (
+                    nearest ===
+                    topDist
+                ) {
+
+                    avoidance.z -=
+                        4.0;
+
+                } else {
+
+                    avoidance.z +=
+                        4.0;
+
+                }
+
+
+                return;
+            }
+
+
+            if (
+                distance >
+                awareness
+            ) {
+                return;
+            }
+
+
+            if (
+                distance <
+                0.001
+            ) {
+                return;
+            }
+
+
+            away.normalize();
+
+
+            /*
+             * Only steer if movement is actually taking
+             * the villager toward the building.
+             */
+
+            const towardBuilding =
+                desiredDirection.dot(
+                    away
+                        .clone()
+                        .multiplyScalar(
+                            -1
+                        )
+                );
+
+
+            if (
+                towardBuilding <=
+                0
+            ) {
+                return;
+            }
+
+
+            const tangentA =
+                new THREE.Vector3(
+                    -away.z,
+                    0,
+                    away.x
+                );
+
+            const tangentB =
+                tangentA
+                    .clone()
+                    .multiplyScalar(
+                        -1
+                    );
+
+
+            const tangent =
+                tangentA.dot(
+                    desiredDirection
+                ) >=
+                tangentB.dot(
+                    desiredDirection
+                )
+                    ? tangentA
+                    : tangentB;
+
+
+            const strength =
+                1 -
+                Math.min(
+                    1,
+                    distance /
+                    awareness
+                );
+
+
+            avoidance.addScaledVector(
+                tangent,
+                strength *
+                    2.6
+            );
+
+
+            avoidance.addScaledVector(
+                away,
+                strength *
+                    1.15
+            );
+
+        }
+    );
+
+
+    return avoidance;
+
+}
+
+
+function keepOutsideBuildingObstacles(
+    position
+) {
+
+    BUILDING_OBSTACLES.forEach(
+        (obstacle) => {
+
+            const margin =
+                0.6;
+
+            const minX =
+                obstacle.x -
+                obstacle.w / 2 -
+                margin;
+
+            const maxX =
+                obstacle.x +
+                obstacle.w / 2 +
+                margin;
+
+            const minZ =
+                obstacle.z -
+                obstacle.d / 2 -
+                margin;
+
+            const maxZ =
+                obstacle.z +
+                obstacle.d / 2 +
+                margin;
+
+
+            const inside =
+                position.x >
+                    minX &&
+                position.x <
+                    maxX &&
+                position.z >
+                    minZ &&
+                position.z <
+                    maxZ;
+
+
+            if (!inside) {
+                return;
+            }
+
+
+            const leftDist =
+                position.x -
+                minX;
+
+            const rightDist =
+                maxX -
+                position.x;
+
+            const topDist =
+                position.z -
+                minZ;
+
+            const bottomDist =
+                maxZ -
+                position.z;
+
+
+            const nearest =
+                Math.min(
+                    leftDist,
+                    rightDist,
+                    topDist,
+                    bottomDist
+                );
+
+
+            if (
+                nearest ===
+                leftDist
+            ) {
+
+                position.x =
+                    minX;
+
+            } else if (
+                nearest ===
+                rightDist
+            ) {
+
+                position.x =
+                    maxX;
+
+            } else if (
+                nearest ===
+                topDist
+            ) {
+
+                position.z =
+                    minZ;
+
+            } else {
+
+                position.z =
+                    maxZ;
+
+            }
+
+        }
+    );
+
+}
+
+
 function avoidCircularObstacles(
     villager,
     desiredDirection
@@ -2250,17 +2612,28 @@ function updateVillagers(
             toTarget.normalize();
 
 
-            const avoidance =
+            const buildingAvoidance =
+                avoidBuildingObstacles(
+                    villager,
+                    toTarget
+                );
+
+
+            const circularAvoidance =
                 avoidCircularObstacles(
                     villager,
                     toTarget
                 );
 
+
             const moveDirection =
                 toTarget
                     .clone()
                     .add(
-                        avoidance
+                        buildingAvoidance
+                    )
+                    .add(
+                        circularAvoidance
                     )
                     .normalize();
 
@@ -2272,6 +2645,11 @@ function updateVillagers(
                         data.speed *
                         delta
                     );
+
+
+            keepOutsideBuildingObstacles(
+                nextPosition
+            );
 
 
             keepOutsideCircularObstacles(
