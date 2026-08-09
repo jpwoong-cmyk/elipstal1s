@@ -496,7 +496,7 @@ function createHut({
 
 
     roofLeft.rotation.z =
-        -0.56;
+        0.56;
 
     roofLeft.position.set(
         -1.22,
@@ -509,7 +509,7 @@ function createHut({
         roofLeft.clone();
 
     roofRight.rotation.z =
-        0.56;
+        -0.56;
 
     roofRight.position.x =
         1.22;
