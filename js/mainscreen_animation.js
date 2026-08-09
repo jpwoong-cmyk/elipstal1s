@@ -264,6 +264,18 @@ if (menuContent) {
                     showReturnHold();
                 }
 
+                if (action === "withdraw") {
+
+                    window.close();
+
+                    window.setTimeout(
+                        () => {
+                            window.location.href = "about:blank";
+                        },
+                        150
+                    );
+
+                }
 
                 return;
             }
