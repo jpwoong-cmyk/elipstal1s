@@ -568,15 +568,7 @@ function showEstablishHold() {
 
 function enterCreatedHold() {
 
-    /*
-     * The Hold has been created and its Seal
-     * has already been forged.
-     *
-     * Add the game-page navigation here once
-     * the destination page is ready.
-     */
-
-    console.log("Enter Your Hold selected");
+    window.location.href = "ingame.html";
 
 }
 

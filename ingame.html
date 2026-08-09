@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Ecliptalis — The Hold</title>
+
+    <link
+        rel="stylesheet"
+        href="css/ingame_screen.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="css/ingame_town.css"
+    >
+
+    <script
+        src="js/ingame_town.js"
+        defer>
+    </script>
+
+    <script
+        src="js/ingame_screen.js"
+        defer>
+    </script>
+</head>
+
+
+<body class="ingame-body">
+
+<div class="ingame-shell">
+
+    <header
+        class="ingame-hud"
+        aria-label="Hold status"
+    >
+
+        <div class="hud-brand">
+            <span
+                class="hud-brand-sigil"
+                aria-hidden="true"
+            >
+                ◇
+            </span>
+
+            <span class="hud-brand-name">
+                ECLIPTALIS
+            </span>
+        </div>
+
+
+        <div class="hud-stat">
+            <span class="hud-stat-label">
+                Town Health
+            </span>
+
+            <span
+                id="townHealthValue"
+                class="hud-stat-value"
+            >
+                100%
+            </span>
+        </div>
+
+
+        <div class="hud-stat">
+            <span class="hud-stat-label">
+                Food
+            </span>
+
+            <span
+                id="foodValue"
+                class="hud-stat-value"
+            >
+                0
+            </span>
+        </div>
+
+
+        <div class="hud-stat">
+            <span class="hud-stat-label">
+                Coin
+            </span>
+
+            <span
+                id="coinValue"
+                class="hud-stat-value"
+            >
+                0
+            </span>
+        </div>
+
+
+        <div class="hud-stat hud-stat-villagers">
+            <span class="hud-stat-label">
+                Villagers
+            </span>
+
+            <span
+                id="villagersValue"
+                class="hud-stat-value"
+            >
+                — / — / —
+            </span>
+        </div>
+
+    </header>
+
+
+    <main
+        id="gameWorld"
+        class="game-world"
+    >
+
+        <div
+            id="wildernessLayer"
+            class="wilderness-layer"
+            aria-hidden="true"
+        ></div>
+
+
+        <div
+            class="field-vignette"
+            aria-hidden="true"
+        ></div>
+
+
+        <section
+            id="town"
+            class="town-zone"
+            aria-label="Your Hold"
+        ></section>
+
+
+        <div
+            class="deployment-ring"
+            aria-label="Deployment positions"
+        >
+
+            <button
+                class="deploy-slot deploy-slot-1"
+                type="button"
+                data-slot-id="deploy-1"
+                data-card-id=""
+                aria-label="Deployment slot 1"
+            >
+                <span class="deploy-slot-number">I</span>
+                <span class="deploy-slot-mark">+</span>
+                <span class="deploy-slot-label">Deploy</span>
+            </button>
+
+
+            <button
+                class="deploy-slot deploy-slot-2"
+                type="button"
+                data-slot-id="deploy-2"
+                data-card-id=""
+                aria-label="Deployment slot 2"
+            >
+                <span class="deploy-slot-number">II</span>
+                <span class="deploy-slot-mark">+</span>
+                <span class="deploy-slot-label">Deploy</span>
+            </button>
+
+
+            <button
+                class="deploy-slot deploy-slot-3"
+                type="button"
+                data-slot-id="deploy-3"
+                data-card-id=""
+                aria-label="Deployment slot 3"
+            >
+                <span class="deploy-slot-number">III</span>
+                <span class="deploy-slot-mark">+</span>
+                <span class="deploy-slot-label">Deploy</span>
+            </button>
+
+
+            <button
+                class="deploy-slot deploy-slot-4"
+                type="button"
+                data-slot-id="deploy-4"
+                data-card-id=""
+                aria-label="Deployment slot 4"
+            >
+                <span class="deploy-slot-number">IV</span>
+                <span class="deploy-slot-mark">+</span>
+                <span class="deploy-slot-label">Deploy</span>
+            </button>
+
+
+            <button
+                class="deploy-slot deploy-slot-5"
+                type="button"
+                data-slot-id="deploy-5"
+                data-card-id=""
+                aria-label="Deployment slot 5"
+            >
+                <span class="deploy-slot-number">V</span>
+                <span class="deploy-slot-mark">+</span>
+                <span class="deploy-slot-label">Deploy</span>
+            </button>
+
+
+            <button
+                class="deploy-slot deploy-slot-6"
+                type="button"
+                data-slot-id="deploy-6"
+                data-card-id=""
+                aria-label="Deployment slot 6"
+            >
+                <span class="deploy-slot-number">VI</span>
+                <span class="deploy-slot-mark">+</span>
+                <span class="deploy-slot-label">Deploy</span>
+            </button>
+
+
+            <button
+                class="deploy-slot deploy-slot-7"
+                type="button"
+                data-slot-id="deploy-7"
+                data-card-id=""
+                aria-label="Deployment slot 7"
+            >
+                <span class="deploy-slot-number">VII</span>
+                <span class="deploy-slot-mark">+</span>
+                <span class="deploy-slot-label">Deploy</span>
+            </button>
+
+
+            <button
+                class="deploy-slot deploy-slot-8"
+                type="button"
+                data-slot-id="deploy-8"
+                data-card-id=""
+                aria-label="Deployment slot 8"
+            >
+                <span class="deploy-slot-number">VIII</span>
+                <span class="deploy-slot-mark">+</span>
+                <span class="deploy-slot-label">Deploy</span>
+            </button>
+
+        </div>
+
+
+        <aside
+            class="ingame-actions"
+            aria-label="Game actions"
+        >
+
+            <button
+                type="button"
+                class="ingame-action-button"
+                data-game-action="booster"
+            >
+                Buy Booster
+            </button>
+
+            <button
+                type="button"
+                class="ingame-action-button"
+                data-game-action="deck"
+            >
+                View Deck
+            </button>
+
+            <button
+                type="button"
+                class="ingame-action-button"
+                data-game-action="settings"
+            >
+                Settings
+            </button>
+
+            <button
+                type="button"
+                class="ingame-action-button"
+                data-game-action="save-exit"
+            >
+                Save &amp; Exit
+            </button>
+
+        </aside>
+
+
+        <div
+            id="fieldMessage"
+            class="field-message"
+            role="status"
+            aria-live="polite"
+        ></div>
+
+    </main>
+
+</div>
+
+</body>
+
+</html>

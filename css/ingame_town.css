@@ -1,0 +1,611 @@
+/* ================================
+   ECLIPTALIS — TOWN V1
+================================ */
+
+.town-zone {
+    position: absolute;
+
+    left: 50%;
+    top: 47%;
+
+    z-index: 5;
+
+    width:
+        min(
+            33vw,
+            455px
+        );
+
+    aspect-ratio:
+        1.22;
+
+    transform:
+        translate(
+            -50%,
+            -50%
+        );
+
+    overflow: visible;
+
+    border-radius:
+        47%
+        53%
+        49%
+        51%
+        /
+        43%
+        46%
+        54%
+        57%;
+
+    background:
+        radial-gradient(
+            ellipse at 50% 50%,
+            rgba(104, 80, 50, 0.97) 0%,
+            rgba(87, 66, 43, 0.96) 43%,
+            rgba(65, 55, 38, 0.9) 67%,
+            rgba(55, 70, 40, 0.12) 76%,
+            transparent 77%
+        );
+
+    filter:
+        drop-shadow(
+            0 12px 17px
+            rgba(0, 0, 0, 0.2)
+        );
+
+    pointer-events: none;
+}
+
+
+.town-zone::before {
+    content: "";
+
+    position: absolute;
+
+    inset: 4%;
+
+    border-radius: 48%;
+
+    opacity: 0.46;
+
+    background:
+        radial-gradient(
+            circle at 20% 32%,
+            rgba(190, 166, 113, 0.16) 0 2px,
+            transparent 3px
+        ),
+        radial-gradient(
+            circle at 69% 70%,
+            rgba(34, 27, 20, 0.28) 0 3px,
+            transparent 4px
+        ),
+        radial-gradient(
+            circle at 54% 25%,
+            rgba(202, 177, 125, 0.1) 0 2px,
+            transparent 3px
+        );
+}
+
+
+/* ================================
+   PATHS
+================================ */
+
+.town-path {
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    z-index: 1;
+
+    width: 12%;
+    height: 58%;
+
+    border-radius: 45%;
+
+    opacity: 0.72;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(121, 93, 58, 0.16),
+            rgba(146, 111, 68, 0.68),
+            rgba(103, 81, 54, 0.25)
+        );
+
+    transform-origin:
+        50%
+        50%;
+}
+
+
+.town-path-north {
+    transform:
+        translate(-50%, -50%)
+        rotate(0deg);
+}
+
+
+.town-path-east {
+    transform:
+        translate(-50%, -50%)
+        rotate(90deg);
+}
+
+
+.town-path-south-east {
+    transform:
+        translate(-50%, -50%)
+        rotate(137deg);
+}
+
+
+.town-path-west {
+    transform:
+        translate(-50%, -50%)
+        rotate(90deg);
+}
+
+
+/* ================================
+   HUTS
+================================ */
+
+.town-hut {
+    position: absolute;
+
+    z-index: 4;
+
+    width: 22%;
+    aspect-ratio: 1.15;
+
+    filter:
+        drop-shadow(
+            4px
+            7px
+            5px
+            rgba(0, 0, 0, 0.38)
+        );
+}
+
+
+.hut-a {
+    left: 19%;
+    top: 24%;
+
+    transform:
+        rotate(-8deg);
+}
+
+
+.hut-b {
+    right: 18%;
+    top: 21%;
+
+    transform:
+        rotate(7deg);
+}
+
+
+.hut-c {
+    left: 22%;
+    bottom: 19%;
+
+    transform:
+        rotate(5deg);
+}
+
+
+.hut-d {
+    right: 19%;
+    bottom: 22%;
+
+    transform:
+        rotate(-6deg);
+}
+
+
+.hut-roof {
+    position: absolute;
+
+    inset: 0;
+
+    overflow: hidden;
+
+    clip-path: polygon(
+        50% 0,
+        100% 28%,
+        88% 100%,
+        12% 100%,
+        0 28%
+    );
+
+    background:
+        linear-gradient(
+            90deg,
+            #4f4030 0%,
+            #6d5940 23%,
+            #4b3b2d 48%,
+            #735d42 53%,
+            #49392b 78%,
+            #332b23 100%
+        );
+
+    border:
+        1px solid
+        rgba(25, 20, 16, 0.7);
+}
+
+
+.hut-roof::before {
+    content: "";
+
+    position: absolute;
+
+    left: 49%;
+    top: 2%;
+
+    width: 2px;
+    height: 96%;
+
+    background:
+        rgba(
+            28,
+            22,
+            17,
+            0.62
+        );
+
+    box-shadow:
+        -12px 3px 0 -1px
+        rgba(36, 28, 21, 0.22),
+        13px 4px 0 -1px
+        rgba(31, 25, 20, 0.22);
+}
+
+
+.hut-roof::after {
+    content: "";
+
+    position: absolute;
+
+    inset: 0;
+
+    opacity: 0.38;
+
+    background:
+        repeating-linear-gradient(
+            7deg,
+            transparent 0 7px,
+            rgba(21, 17, 14, 0.33) 7px 8px
+        );
+}
+
+
+.hut-door {
+    position: absolute;
+
+    left: 50%;
+    bottom: -2%;
+
+    z-index: 2;
+
+    width: 15%;
+    height: 18%;
+
+    border-radius:
+        4px
+        4px
+        0
+        0;
+
+    background: #211914;
+
+    transform:
+        translateX(-50%);
+
+    box-shadow:
+        inset 0 0 0 1px
+        rgba(151, 114, 73, 0.18);
+}
+
+
+.hut-chimney {
+    position: absolute;
+
+    right: 17%;
+    top: 10%;
+
+    z-index: 3;
+
+    width: 9%;
+    height: 18%;
+
+    background:
+        linear-gradient(
+            135deg,
+            #5e564a,
+            #393630
+        );
+
+    box-shadow:
+        2px 2px 3px
+        rgba(0, 0, 0, 0.34);
+}
+
+
+/* ================================
+   FARM
+================================ */
+
+.town-farm {
+    position: absolute;
+
+    right: 5%;
+    bottom: 5%;
+
+    z-index: 3;
+
+    width: 31%;
+    height: 26%;
+
+    overflow: hidden;
+
+    border:
+        3px solid
+        #5c4830;
+
+    background:
+        repeating-linear-gradient(
+            90deg,
+            #59432b 0 7px,
+            #76572f 7px 10px,
+            #493922 10px 17px
+        );
+
+    transform:
+        rotate(-4deg);
+
+    box-shadow:
+        4px
+        7px
+        7px
+        rgba(0, 0, 0, 0.28);
+}
+
+
+.town-farm::before {
+    content: "";
+
+    position: absolute;
+
+    inset: 4px;
+
+    opacity: 0.8;
+
+    background:
+        repeating-linear-gradient(
+            0deg,
+            transparent 0 12px,
+            rgba(113, 139, 67, 0.52) 12px 14px
+        );
+}
+
+
+.town-farm::after {
+    content: "";
+
+    position: absolute;
+
+    inset: 0;
+
+    box-shadow:
+        inset 0 0 15px
+        rgba(0, 0, 0, 0.34);
+}
+
+
+/* ================================
+   WELL / FIRE RING
+================================ */
+
+.town-well {
+    position: absolute;
+
+    left: 50%;
+    top: 49%;
+
+    z-index: 6;
+
+    width: 10%;
+    aspect-ratio: 1;
+
+    border-radius: 50%;
+
+    border:
+        5px solid
+        #68635a;
+
+    background:
+        radial-gradient(
+            circle,
+            #172124 0 42%,
+            #363b3a 44% 52%,
+            #655f55 53% 100%
+        );
+
+    transform:
+        translate(-50%, -50%);
+
+    box-shadow:
+        3px
+        5px
+        5px
+        rgba(0, 0, 0, 0.38);
+}
+
+
+.town-well::after {
+    content: "";
+
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    width: 38%;
+    height: 2px;
+
+    background: #877e6d;
+
+    transform:
+        translate(-50%, -50%)
+        rotate(26deg);
+}
+
+
+/* ================================
+   FENCE
+================================ */
+
+.town-fence {
+    position: absolute;
+
+    z-index: 5;
+
+    height: 3px;
+
+    border-radius: 3px;
+
+    background: #6a5034;
+
+    box-shadow:
+        0 0 0 1px
+        rgba(43, 31, 20, 0.28);
+}
+
+
+.fence-a {
+    left: 7%;
+    top: 55%;
+
+    width: 21%;
+
+    transform:
+        rotate(74deg);
+}
+
+
+.fence-b {
+    right: 4%;
+    top: 51%;
+
+    width: 20%;
+
+    transform:
+        rotate(102deg);
+}
+
+
+.fence-c {
+    left: 38%;
+    bottom: 6%;
+
+    width: 20%;
+
+    transform:
+        rotate(4deg);
+}
+
+
+/* ================================
+   TOWN LABEL
+================================ */
+
+.town-nameplate {
+    position: absolute;
+
+    left: 50%;
+    top: 61%;
+
+    z-index: 7;
+
+    padding:
+        3px
+        7px;
+
+    color:
+        rgba(
+            224,
+            220,
+            210,
+            0.55
+        );
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size: clamp(
+        8px,
+        0.7vw,
+        11px
+    );
+
+    font-style: italic;
+
+    letter-spacing: 0.08em;
+
+    transform:
+        translateX(-50%);
+
+    text-shadow:
+        0 2px 3px
+        rgba(0, 0, 0, 0.68);
+}
+
+
+/* ================================
+   MOBILE
+================================ */
+
+@media (max-width: 700px) {
+
+    .town-zone {
+        top: 44%;
+
+        width:
+            min(
+                54vw,
+                330px
+            );
+    }
+
+
+    .town-farm {
+        border-width: 2px;
+    }
+
+
+    .town-well {
+        border-width: 3px;
+    }
+
+}
+
+
+@media (max-width: 440px) {
+
+    .town-zone {
+        width: 52vw;
+    }
+
+
+    .town-nameplate {
+        display: none;
+    }
+
+}

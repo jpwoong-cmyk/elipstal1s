@@ -1,0 +1,1289 @@
+/* ================================
+   ECLIPTALIS — IN-GAME SCREEN V1
+================================ */
+
+:root {
+    --hud-height: 58px;
+
+    --ink-black: #050606;
+    --steel-1: #d9dde0;
+    --steel-2: #91999e;
+    --steel-3: #535b60;
+
+    --grass-dark: #20351e;
+    --grass-mid: #2f5628;
+    --grass-light: #426b35;
+
+    --earth-dark: #32291f;
+    --earth-mid: #57442f;
+
+    --slot-width: clamp(82px, 7.2vw, 116px);
+}
+
+
+* {
+    box-sizing: border-box;
+}
+
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}
+
+
+body {
+    overflow: hidden;
+}
+
+
+button {
+    font: inherit;
+}
+
+
+.ingame-body {
+    background: #111;
+
+    color: #eceeef;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+}
+
+
+.ingame-shell {
+    width: 100vw;
+    height: 100svh;
+
+    display: grid;
+
+    grid-template-rows:
+        var(--hud-height)
+        minmax(0, 1fr);
+
+    overflow: hidden;
+
+    background: #141714;
+}
+
+
+/* ================================
+   HUD
+================================ */
+
+.ingame-hud {
+    position: relative;
+
+    z-index: 20;
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(245px, 1.45fr)
+        repeat(4, minmax(145px, 1fr));
+
+    min-height: var(--hud-height);
+
+    background:
+        linear-gradient(
+            180deg,
+            #0d0f10 0%,
+            #030404 100%
+        );
+
+    border-bottom:
+        1px solid
+        rgba(187, 194, 199, 0.3);
+
+    box-shadow:
+        0 8px 24px
+        rgba(0, 0, 0, 0.38);
+}
+
+
+.hud-brand,
+.hud-stat {
+    min-width: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    border-right:
+        1px solid
+        rgba(168, 174, 180, 0.2);
+}
+
+
+.hud-brand {
+    gap: 12px;
+
+    padding:
+        0
+        clamp(18px, 2vw, 32px);
+}
+
+
+.hud-brand-sigil {
+    display: grid;
+
+    place-items: center;
+
+    width: 27px;
+    height: 27px;
+
+    flex: 0 0 auto;
+
+    border:
+        1px solid
+        rgba(186, 194, 200, 0.38);
+
+    color: #cfd5d9;
+
+    transform:
+        rotate(45deg);
+
+    box-shadow:
+        inset 0 0 9px
+        rgba(215, 222, 227, 0.08);
+}
+
+
+.hud-brand-sigil::first-letter {
+    transform:
+        rotate(-45deg);
+}
+
+
+.hud-brand-name {
+    overflow: hidden;
+
+    color: #f2f3f4;
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size: clamp(
+        15px,
+        1.3vw,
+        21px
+    );
+
+    letter-spacing:
+        0.28em;
+
+    white-space: nowrap;
+
+    text-overflow: ellipsis;
+}
+
+
+.hud-stat {
+    gap: 8px;
+
+    justify-content: center;
+
+    padding:
+        0
+        14px;
+
+    white-space: nowrap;
+}
+
+
+.hud-stat-label {
+    color:
+        rgba(
+            191,
+            197,
+            201,
+            0.68
+        );
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size: clamp(
+        11px,
+        0.86vw,
+        14px
+    );
+
+    letter-spacing:
+        0.04em;
+}
+
+
+.hud-stat-value {
+    color: #f0f1f2;
+
+    font-size: clamp(
+        14px,
+        1.12vw,
+        19px
+    );
+}
+
+
+/* ================================
+   WORLD
+================================ */
+
+.game-world {
+    position: relative;
+
+    min-height: 0;
+
+    overflow: hidden;
+
+    isolation: isolate;
+
+    background:
+        radial-gradient(
+            ellipse at 50% 46%,
+            rgba(83, 113, 59, 0.52) 0%,
+            rgba(51, 88, 43, 0.7) 36%,
+            rgba(30, 57, 27, 0.98) 78%
+        ),
+        repeating-linear-gradient(
+            17deg,
+            rgba(255, 255, 255, 0.012) 0 1px,
+            transparent 1px 8px
+        ),
+        var(--grass-dark);
+}
+
+
+.game-world::before {
+    content: "";
+
+    position: absolute;
+
+    inset: 0;
+
+    z-index: -3;
+
+    opacity: 0.35;
+
+    background:
+        radial-gradient(
+            circle at 12% 22%,
+            rgba(110, 139, 76, 0.28) 0 8%,
+            transparent 8.5%
+        ),
+        radial-gradient(
+            circle at 89% 14%,
+            rgba(94, 123, 68, 0.22) 0 10%,
+            transparent 10.5%
+        ),
+        radial-gradient(
+            circle at 14% 80%,
+            rgba(23, 47, 24, 0.45) 0 13%,
+            transparent 13.5%
+        ),
+        radial-gradient(
+            circle at 88% 76%,
+            rgba(21, 43, 22, 0.48) 0 14%,
+            transparent 14.5%
+        );
+}
+
+
+.field-vignette {
+    position: absolute;
+
+    inset: 0;
+
+    z-index: 12;
+
+    pointer-events: none;
+
+    box-shadow:
+        inset 0 0 120px
+        rgba(0, 0, 0, 0.52),
+        inset 0 0 28px
+        rgba(0, 0, 0, 0.3);
+}
+
+
+/* ================================
+   WILDERNESS
+================================ */
+
+.wilderness-layer {
+    position: absolute;
+
+    inset: 0;
+
+    z-index: 1;
+
+    pointer-events: none;
+}
+
+
+.wild-tree {
+    position: absolute;
+
+    left:
+        calc(
+            var(--tree-x)
+            * 1%
+        );
+
+    top:
+        calc(
+            var(--tree-y)
+            * 1%
+        );
+
+    width: 32px;
+    height: 32px;
+
+    transform:
+        translate(-50%, -50%)
+        scale(var(--tree-scale));
+
+    filter:
+        drop-shadow(
+            4px
+            5px
+            4px
+            rgba(0, 0, 0, 0.36)
+        );
+}
+
+
+.wild-tree::before,
+.wild-tree::after {
+    content: "";
+
+    position: absolute;
+
+    border-radius: 50%;
+}
+
+
+.wild-tree::before {
+    inset: 3px;
+
+    background:
+        radial-gradient(
+            circle at 34% 30%,
+            #607b45 0 9%,
+            #395d34 35%,
+            #203e29 68%,
+            #152d21 100%
+        );
+
+    box-shadow:
+        -8px 5px 0 -3px #2c4f2e,
+        8px 6px 0 -4px #1e3d28,
+        1px -7px 0 -4px #496a39;
+}
+
+
+.wild-tree::after {
+    left: 14px;
+    top: 14px;
+
+    width: 5px;
+    height: 7px;
+
+    background: #4a3524;
+
+    box-shadow:
+        0 0 0 1px
+        rgba(0, 0, 0, 0.28);
+}
+
+
+.grass-tuft {
+    position: absolute;
+
+    left:
+        calc(
+            var(--grass-x)
+            * 1%
+        );
+
+    top:
+        calc(
+            var(--grass-y)
+            * 1%
+        );
+
+    width: 13px;
+    height: 13px;
+
+    opacity: var(--grass-opacity);
+
+    transform:
+        rotate(
+            calc(
+                var(--grass-rotate)
+                * 1deg
+            )
+        );
+}
+
+
+.grass-tuft::before {
+    content: "";
+
+    position: absolute;
+
+    left: 6px;
+    top: 1px;
+
+    width: 1px;
+    height: 11px;
+
+    background: #6f8d51;
+
+    box-shadow:
+        -4px 2px 0 #527342,
+        4px 1px 0 #456a3a,
+        -2px -1px 0 #78935a;
+
+    transform:
+        rotate(18deg);
+}
+
+
+.wild-stone {
+    position: absolute;
+
+    left:
+        calc(
+            var(--stone-x)
+            * 1%
+        );
+
+    top:
+        calc(
+            var(--stone-y)
+            * 1%
+        );
+
+    width: 12px;
+    height: 9px;
+
+    border-radius:
+        55%
+        45%
+        48%
+        52%;
+
+    opacity: 0.55;
+
+    background:
+        linear-gradient(
+            135deg,
+            #777b75,
+            #3e4440 70%
+        );
+
+    transform:
+        rotate(
+            calc(
+                var(--stone-rotate)
+                * 1deg
+            )
+        );
+
+    box-shadow:
+        2px 3px 3px
+        rgba(0, 0, 0, 0.28);
+}
+
+
+/* ================================
+   DEPLOYMENT SLOTS
+================================ */
+
+.deployment-ring {
+    position: absolute;
+
+    inset: 0;
+
+    z-index: 8;
+
+    pointer-events: none;
+}
+
+
+.deploy-slot {
+    position: absolute;
+
+    width: var(--slot-width);
+
+    aspect-ratio: 2.5 / 3.5;
+
+    display: grid;
+
+    grid-template-rows:
+        auto
+        1fr
+        auto;
+
+    place-items: center;
+
+    padding:
+        8px
+        7px
+        10px;
+
+    border:
+        1px solid
+        rgba(188, 196, 201, 0.4);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(15, 18, 18, 0.66),
+            rgba(3, 5, 5, 0.82)
+        );
+
+    color:
+        rgba(
+            215,
+            220,
+            223,
+            0.72
+        );
+
+    cursor: pointer;
+
+    pointer-events: auto;
+
+    clip-path: polygon(
+        8px 0,
+        calc(100% - 8px) 0,
+        100% 8px,
+        100% calc(100% - 8px),
+        calc(100% - 8px) 100%,
+        8px 100%,
+        0 calc(100% - 8px),
+        0 8px
+    );
+
+    box-shadow:
+        inset 0 0 0 1px
+        rgba(255, 255, 255, 0.025),
+        0 8px 22px
+        rgba(0, 0, 0, 0.28);
+
+    transform:
+        translate(-50%, -50%);
+
+    transition:
+        border-color 160ms ease,
+        background 160ms ease,
+        box-shadow 160ms ease,
+        transform 160ms ease;
+}
+
+
+.deploy-slot::before {
+    content: "";
+
+    position: absolute;
+
+    inset: 6px;
+
+    border:
+        1px solid
+        rgba(162, 169, 173, 0.11);
+
+    pointer-events: none;
+}
+
+
+.deploy-slot:hover,
+.deploy-slot:focus-visible,
+.deploy-slot.is-selected {
+    border-color:
+        rgba(224, 229, 232, 0.82);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(37, 42, 43, 0.76),
+            rgba(7, 9, 9, 0.9)
+        );
+
+    box-shadow:
+        inset 0 0 0 1px
+        rgba(255, 255, 255, 0.055),
+        0 0 14px
+        rgba(197, 208, 214, 0.12),
+        0 9px 24px
+        rgba(0, 0, 0, 0.34);
+
+    outline: none;
+
+    transform:
+        translate(-50%, -50%)
+        translateY(-2px);
+}
+
+
+.deploy-slot-number {
+    justify-self: start;
+
+    color:
+        rgba(
+            171,
+            178,
+            182,
+            0.5
+        );
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size: 10px;
+
+    letter-spacing: 0.08em;
+}
+
+
+.deploy-slot-mark {
+    color:
+        rgba(
+            196,
+            204,
+            209,
+            0.38
+        );
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size: clamp(
+        24px,
+        2.2vw,
+        38px
+    );
+
+    font-weight: 300;
+
+    line-height: 1;
+}
+
+
+.deploy-slot-label {
+    color:
+        rgba(
+            217,
+            221,
+            224,
+            0.7
+        );
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size: clamp(
+        10px,
+        0.8vw,
+        13px
+    );
+
+    letter-spacing: 0.09em;
+
+    text-transform: uppercase;
+}
+
+
+.deploy-slot-1 {
+    left: 33%;
+    top: 18%;
+}
+
+
+.deploy-slot-2 {
+    left: 50%;
+    top: 11%;
+}
+
+
+.deploy-slot-3 {
+    left: 67%;
+    top: 18%;
+}
+
+
+.deploy-slot-4 {
+    left: 76%;
+    top: 45%;
+}
+
+
+.deploy-slot-5 {
+    left: 67%;
+    top: 72%;
+}
+
+
+.deploy-slot-6 {
+    left: 50%;
+    top: 79%;
+}
+
+
+.deploy-slot-7 {
+    left: 33%;
+    top: 72%;
+}
+
+
+.deploy-slot-8 {
+    left: 24%;
+    top: 45%;
+}
+
+
+/* ================================
+   GAME ACTIONS
+================================ */
+
+.ingame-actions {
+    position: absolute;
+
+    right: clamp(
+        14px,
+        2vw,
+        30px
+    );
+
+    bottom: clamp(
+        16px,
+        2.2vh,
+        28px
+    );
+
+    z-index: 14;
+
+    width: clamp(
+        145px,
+        11vw,
+        185px
+    );
+
+    display: grid;
+
+    gap: 8px;
+}
+
+
+.ingame-action-button {
+    min-height: 39px;
+
+    padding:
+        8px
+        12px;
+
+    border:
+        1px solid
+        rgba(186, 193, 198, 0.46);
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(16, 18, 19, 0.94),
+            rgba(3, 4, 4, 0.98)
+        );
+
+    color:
+        rgba(
+            229,
+            232,
+            234,
+            0.86
+        );
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size: 14px;
+
+    cursor: pointer;
+
+    clip-path: polygon(
+        6px 0,
+        calc(100% - 6px) 0,
+        100% 6px,
+        100% calc(100% - 6px),
+        calc(100% - 6px) 100%,
+        6px 100%,
+        0 calc(100% - 6px),
+        0 6px
+    );
+
+    transition:
+        color 160ms ease,
+        border-color 160ms ease,
+        transform 160ms ease,
+        box-shadow 160ms ease;
+}
+
+
+.ingame-action-button:hover,
+.ingame-action-button:focus-visible {
+    color: #fff;
+
+    border-color:
+        rgba(220, 226, 230, 0.84);
+
+    box-shadow:
+        0 0 12px
+        rgba(197, 207, 214, 0.1);
+
+    outline: none;
+
+    transform:
+        translateX(-3px);
+}
+
+
+/* ================================
+   FIELD MESSAGE
+================================ */
+
+.field-message {
+    position: absolute;
+
+    left: clamp(
+        16px,
+        2vw,
+        30px
+    );
+
+    bottom: clamp(
+        16px,
+        2.2vh,
+        28px
+    );
+
+    z-index: 14;
+
+    max-width: min(
+        420px,
+        48vw
+    );
+
+    min-height: 22px;
+
+    padding:
+        7px
+        10px;
+
+    color:
+        rgba(
+            218,
+            222,
+            224,
+            0
+        );
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size: 13px;
+
+    font-style: italic;
+
+    letter-spacing: 0.025em;
+
+    pointer-events: none;
+
+    transition:
+        color 220ms ease,
+        background 220ms ease;
+}
+
+
+.field-message.is-visible {
+    color:
+        rgba(
+            218,
+            222,
+            224,
+            0.76
+        );
+
+    background:
+        rgba(
+            3,
+            5,
+            5,
+            0.44
+        );
+}
+
+
+/* ================================
+   TABLET
+================================ */
+
+@media (max-width: 1050px) {
+
+    :root {
+        --slot-width: clamp(
+            72px,
+            8.5vw,
+            96px
+        );
+    }
+
+
+    .ingame-hud {
+        grid-template-columns:
+            minmax(210px, 1.25fr)
+            repeat(4, minmax(115px, 1fr));
+    }
+
+
+    .hud-stat {
+        gap: 5px;
+
+        padding:
+            0
+            8px;
+    }
+
+
+    .hud-stat-label {
+        display: none;
+    }
+
+
+    .hud-stat::before {
+        color:
+            rgba(
+                177,
+                184,
+                188,
+                0.56
+            );
+
+        font-family:
+            Georgia,
+            "Times New Roman",
+            serif;
+
+        font-size: 10px;
+
+        letter-spacing: 0.07em;
+
+        text-transform: uppercase;
+    }
+
+
+    .hud-stat:nth-child(2)::before {
+        content: "Health";
+    }
+
+
+    .hud-stat:nth-child(3)::before {
+        content: "Food";
+    }
+
+
+    .hud-stat:nth-child(4)::before {
+        content: "Coin";
+    }
+
+
+    .hud-stat:nth-child(5)::before {
+        content: "Villagers";
+    }
+
+}
+
+
+/* ================================
+   MOBILE
+================================ */
+
+@media (max-width: 700px) {
+
+    :root {
+        --hud-height: 92px;
+        --slot-width: 67px;
+    }
+
+
+    .ingame-hud {
+        grid-template-columns:
+            repeat(
+                4,
+                minmax(
+                    0,
+                    1fr
+                )
+            );
+
+        grid-template-rows:
+            46px
+            46px;
+    }
+
+
+    .hud-brand {
+        grid-column:
+            span 2;
+
+        padding:
+            0
+            13px;
+    }
+
+
+    .hud-brand-name {
+        font-size: 13px;
+
+        letter-spacing: 0.2em;
+    }
+
+
+    .hud-brand-sigil {
+        width: 22px;
+        height: 22px;
+    }
+
+
+    .hud-stat {
+        border-top:
+            1px solid
+            rgba(168, 174, 180, 0.14);
+
+        border-right:
+            1px solid
+            rgba(168, 174, 180, 0.14);
+    }
+
+
+    .hud-stat:nth-child(2),
+    .hud-stat:nth-child(3) {
+        border-top: 0;
+    }
+
+
+    .hud-stat-villagers {
+        grid-column:
+            span 2;
+    }
+
+
+    .hud-stat-value {
+        font-size: 13px;
+    }
+
+
+    .deploy-slot-1 {
+        left: 26%;
+        top: 20%;
+    }
+
+
+    .deploy-slot-2 {
+        left: 50%;
+        top: 15%;
+    }
+
+
+    .deploy-slot-3 {
+        left: 74%;
+        top: 20%;
+    }
+
+
+    .deploy-slot-4 {
+        left: 84%;
+        top: 43%;
+    }
+
+
+    .deploy-slot-5 {
+        left: 74%;
+        top: 66%;
+    }
+
+
+    .deploy-slot-6 {
+        left: 50%;
+        top: 72%;
+    }
+
+
+    .deploy-slot-7 {
+        left: 26%;
+        top: 66%;
+    }
+
+
+    .deploy-slot-8 {
+        left: 16%;
+        top: 43%;
+    }
+
+
+    .ingame-actions {
+        left: 50%;
+        right: auto;
+
+        bottom: 10px;
+
+        width:
+            min(
+                94vw,
+                520px
+            );
+
+        grid-template-columns:
+            repeat(
+                4,
+                1fr
+            );
+
+        gap: 5px;
+
+        transform:
+            translateX(-50%);
+    }
+
+
+    .ingame-action-button {
+        min-height: 34px;
+
+        padding:
+            6px
+            5px;
+
+        font-size: 10px;
+    }
+
+
+    .ingame-action-button:hover,
+    .ingame-action-button:focus-visible {
+        transform: none;
+    }
+
+
+    .field-message {
+        left: 50%;
+        bottom: 54px;
+
+        width:
+            min(
+                86vw,
+                380px
+            );
+
+        max-width: none;
+
+        text-align: center;
+
+        transform:
+            translateX(-50%);
+    }
+
+}
+
+
+/* ================================
+   SMALL MOBILE
+================================ */
+
+@media (max-width: 440px) {
+
+    :root {
+        --slot-width: 57px;
+    }
+
+
+    .hud-brand {
+        gap: 8px;
+
+        padding:
+            0
+            9px;
+    }
+
+
+    .hud-brand-name {
+        font-size: 11px;
+
+        letter-spacing: 0.15em;
+    }
+
+
+    .hud-stat-value {
+        font-size: 12px;
+    }
+
+
+    .deploy-slot {
+        padding:
+            5px
+            4px
+            6px;
+    }
+
+
+    .deploy-slot-number {
+        font-size: 8px;
+    }
+
+
+    .deploy-slot-label {
+        font-size: 8px;
+    }
+
+
+    .deploy-slot-mark {
+        font-size: 20px;
+    }
+
+
+    .ingame-action-button {
+        font-size: 9px;
+    }
+
+}
+
+
+/* ================================
+   REDUCED MOTION
+================================ */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .deploy-slot,
+    .ingame-action-button,
+    .field-message {
+        transition: none;
+    }
+
+}
