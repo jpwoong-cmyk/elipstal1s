@@ -39,8 +39,17 @@ const BUILDING_OBSTACLES = [
     { x: 7.0, z: -5.0, w: 6.4, d: 5.4 },
     { x: -7.0, z: 6.3, w: 5.8, d: 5.0 },
     { x: 7.4, z: 6.4, w: 6.0, d: 5.0 },
-    { x: 13.0, z: 7.2, w: 7.5, d: 6.0 },
-    { x: 0.0, z: 1.0, w: 3.0, d: 3.0 }
+    { x: 13.0, z: 7.2, w: 7.5, d: 6.0 }
+];
+
+
+const CIRCULAR_OBSTACLES = [
+    {
+        id: "town-well",
+        x: 0,
+        z: 1,
+        radius: 2.15
+    }
 ];
 
 
@@ -1553,25 +1562,58 @@ function isInsideObstacle(
     z
 ) {
 
-    return BUILDING_OBSTACLES.some(
+    const insideBuilding =
+        BUILDING_OBSTACLES.some(
+            (obstacle) => {
+
+                return (
+                    Math.abs(
+                        x -
+                        obstacle.x
+                    ) <
+                    obstacle.w /
+                    2 +
+                    0.8 &&
+                    Math.abs(
+                        z -
+                        obstacle.z
+                    ) <
+                    obstacle.d /
+                    2 +
+                    0.8
+                );
+
+            }
+        );
+
+
+    if (insideBuilding) {
+        return true;
+    }
+
+
+    return CIRCULAR_OBSTACLES.some(
         (obstacle) => {
 
+            const dx =
+                x -
+                obstacle.x;
+
+            const dz =
+                z -
+                obstacle.z;
+
+            const safeRadius =
+                obstacle.radius +
+                0.55;
+
+
             return (
-                Math.abs(
-                    x -
-                    obstacle.x
-                ) <
-                obstacle.w /
-                2 +
-                0.8 &&
-                Math.abs(
-                    z -
-                    obstacle.z
-                ) <
-                obstacle.d /
-                2 +
-                0.8
-            );
+                dx * dx +
+                dz * dz
+            ) <
+            safeRadius *
+            safeRadius;
 
         }
     );
@@ -1952,6 +1994,222 @@ function createVillagers(
 }
 
 
+function avoidCircularObstacles(
+    villager,
+    desiredDirection
+) {
+
+    const avoidance =
+        new THREE.Vector3();
+
+
+    CIRCULAR_OBSTACLES.forEach(
+        (obstacle) => {
+
+            const offset =
+                new THREE.Vector3(
+                    villager.position.x -
+                        obstacle.x,
+                    0,
+                    villager.position.z -
+                        obstacle.z
+                );
+
+            const distance =
+                offset.length();
+
+            const safeRadius =
+                obstacle.radius +
+                0.55;
+
+            const awarenessRadius =
+                safeRadius +
+                2.4;
+
+
+            if (
+                distance >
+                awarenessRadius
+            ) {
+                return;
+            }
+
+
+            if (
+                distance <
+                safeRadius
+            ) {
+
+                if (
+                    distance <
+                    0.001
+                ) {
+                    offset.set(
+                        1,
+                        0,
+                        0
+                    );
+                } else {
+                    offset.normalize();
+                }
+
+
+                avoidance.addScaledVector(
+                    offset,
+                    3.4 +
+                    (
+                        safeRadius -
+                        distance
+                    ) *
+                    2.2
+                );
+
+                return;
+            }
+
+
+            offset.normalize();
+
+
+            const tangentA =
+                new THREE.Vector3(
+                    -offset.z,
+                    0,
+                    offset.x
+                );
+
+            const tangentB =
+                tangentA
+                    .clone()
+                    .multiplyScalar(
+                        -1
+                    );
+
+            const tangent =
+                tangentA.dot(
+                    desiredDirection
+                ) >=
+                tangentB.dot(
+                    desiredDirection
+                )
+                    ? tangentA
+                    : tangentB;
+
+            const approachStrength =
+                1 -
+                (
+                    distance -
+                    safeRadius
+                ) /
+                (
+                    awarenessRadius -
+                    safeRadius
+                );
+
+            const towardWell =
+                desiredDirection.dot(
+                    offset
+                        .clone()
+                        .multiplyScalar(
+                            -1
+                        )
+                );
+
+
+            if (
+                towardWell >
+                0
+            ) {
+
+                avoidance.addScaledVector(
+                    tangent,
+                    approachStrength *
+                    2.4
+                );
+
+                avoidance.addScaledVector(
+                    offset,
+                    approachStrength *
+                    0.85
+                );
+
+            }
+
+        }
+    );
+
+
+    return avoidance;
+
+}
+
+
+function keepOutsideCircularObstacles(
+    position
+) {
+
+    CIRCULAR_OBSTACLES.forEach(
+        (obstacle) => {
+
+            const dx =
+                position.x -
+                obstacle.x;
+
+            const dz =
+                position.z -
+                obstacle.z;
+
+            const safeRadius =
+                obstacle.radius +
+                0.5;
+
+            const distanceSquared =
+                dx * dx +
+                dz * dz;
+
+
+            if (
+                distanceSquared >=
+                safeRadius *
+                safeRadius
+            ) {
+                return;
+            }
+
+
+            const distance =
+                Math.max(
+                    Math.sqrt(
+                        distanceSquared
+                    ),
+                    0.001
+                );
+
+            const nx =
+                dx /
+                distance;
+
+            const nz =
+                dz /
+                distance;
+
+
+            position.x =
+                obstacle.x +
+                nx *
+                safeRadius;
+
+            position.z =
+                obstacle.z +
+                nz *
+                safeRadius;
+
+        }
+    );
+
+}
+
+
 function updateVillagers(
     villagers,
     delta,
@@ -1992,17 +2250,46 @@ function updateVillagers(
             toTarget.normalize();
 
 
-            villager.position.addScaledVector(
-                toTarget,
-                data.speed *
-                delta
+            const avoidance =
+                avoidCircularObstacles(
+                    villager,
+                    toTarget
+                );
+
+            const moveDirection =
+                toTarget
+                    .clone()
+                    .add(
+                        avoidance
+                    )
+                    .normalize();
+
+            const nextPosition =
+                villager.position
+                    .clone()
+                    .addScaledVector(
+                        moveDirection,
+                        data.speed *
+                        delta
+                    );
+
+
+            keepOutsideCircularObstacles(
+                nextPosition
             );
+
+
+            villager.position.x =
+                nextPosition.x;
+
+            villager.position.z =
+                nextPosition.z;
 
 
             villager.rotation.y =
                 Math.atan2(
-                    toTarget.x,
-                    toTarget.z
+                    moveDirection.x,
+                    moveDirection.z
                 );
 
 
