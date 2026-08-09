@@ -53,6 +53,150 @@ const CIRCULAR_OBSTACLES = [
 ];
 
 
+/* ============================================================
+   WALKABLE TOWN NETWORK
+   ------------------------------------------------------------
+   Villagers now travel along explicit town paths instead of
+   choosing arbitrary points and attempting to dodge assets.
+   Buildings/well collision remain as a final safety layer.
+============================================================ */
+
+const WALK_NODES = {
+    northGate:       { x: 0.0,  z: -12.0 },
+    northMid:        { x: 0.0,  z: -8.7 },
+
+    northWestLane:   { x: -3.3, z: -2.5 },
+    northEastLane:   { x: 3.3,  z: -2.5 },
+
+    westGate:        { x: -12.0, z: 0.0 },
+    westMid:         { x: -8.8,  z: 0.0 },
+
+    wellWestNorth:   { x: -3.4, z: -0.7 },
+    wellWestSouth:   { x: -3.4, z: 3.1 },
+
+    wellEastNorth:   { x: 3.4,  z: -0.7 },
+    wellEastSouth:   { x: 3.4,  z: 3.1 },
+
+    eastMid:         { x: 8.8,  z: 0.0 },
+    eastGate:        { x: 12.0, z: 0.0 },
+
+    southWestLane:   { x: -3.4, z: 5.0 },
+    southEastLane:   { x: 3.4,  z: 5.0 },
+
+    southMid:        { x: 0.0,  z: 8.5 },
+    southGate:       { x: 0.0,  z: 11.5 },
+
+    farmTurn:        { x: 6.3,  z: 4.8 },
+    farmApproach:    { x: 8.8,  z: 6.3 }
+};
+
+
+const WALK_LINKS = {
+    northGate: [
+        "northMid"
+    ],
+
+    northMid: [
+        "northGate",
+        "northWestLane",
+        "northEastLane"
+    ],
+
+    northWestLane: [
+        "northMid",
+        "wellWestNorth"
+    ],
+
+    northEastLane: [
+        "northMid",
+        "wellEastNorth"
+    ],
+
+    westGate: [
+        "westMid"
+    ],
+
+    westMid: [
+        "westGate",
+        "wellWestNorth",
+        "wellWestSouth"
+    ],
+
+    wellWestNorth: [
+        "northWestLane",
+        "westMid",
+        "wellWestSouth"
+    ],
+
+    wellWestSouth: [
+        "wellWestNorth",
+        "westMid",
+        "southWestLane"
+    ],
+
+    wellEastNorth: [
+        "northEastLane",
+        "eastMid",
+        "wellEastSouth"
+    ],
+
+    wellEastSouth: [
+        "wellEastNorth",
+        "eastMid",
+        "southEastLane",
+        "farmTurn"
+    ],
+
+    eastMid: [
+        "wellEastNorth",
+        "wellEastSouth",
+        "eastGate"
+    ],
+
+    eastGate: [
+        "eastMid"
+    ],
+
+    southWestLane: [
+        "wellWestSouth",
+        "southMid"
+    ],
+
+    southEastLane: [
+        "wellEastSouth",
+        "southMid",
+        "farmTurn"
+    ],
+
+    southMid: [
+        "southWestLane",
+        "southEastLane",
+        "southGate"
+    ],
+
+    southGate: [
+        "southMid"
+    ],
+
+    farmTurn: [
+        "wellEastSouth",
+        "southEastLane",
+        "farmApproach"
+    ],
+
+    farmApproach: [
+        "farmTurn"
+    ]
+};
+
+
+const WALK_NODE_IDS =
+    Object.keys(
+        WALK_NODES
+    );
+
+
+
 function seededRandom(seed = 0xEC1A17) {
 
     let value = seed >>> 0;
@@ -1621,64 +1765,411 @@ function isInsideObstacle(
 }
 
 
-function chooseVillagerTarget() {
+function getWalkNodeVector(
+    nodeId
+) {
 
-    for (
-        let attempt = 0;
-        attempt < 60;
-        attempt += 1
+    const node =
+        WALK_NODES[
+            nodeId
+        ];
+
+
+    return new THREE.Vector3(
+        node.x,
+        0,
+        node.z
+    );
+
+}
+
+
+function getNearestWalkNodeId(
+    position
+) {
+
+    let nearestId =
+        WALK_NODE_IDS[0];
+
+    let nearestDistance =
+        Infinity;
+
+
+    WALK_NODE_IDS.forEach(
+        (nodeId) => {
+
+            const node =
+                WALK_NODES[
+                    nodeId
+                ];
+
+
+            const dx =
+                position.x -
+                node.x;
+
+            const dz =
+                position.z -
+                node.z;
+
+            const distance =
+                dx * dx +
+                dz * dz;
+
+
+            if (
+                distance <
+                nearestDistance
+            ) {
+
+                nearestDistance =
+                    distance;
+
+                nearestId =
+                    nodeId;
+
+            }
+
+        }
+    );
+
+
+    return nearestId;
+
+}
+
+
+function findWalkRoute(
+    startId,
+    destinationId
+) {
+
+    if (
+        startId ===
+        destinationId
+    ) {
+        return [
+            startId
+        ];
+    }
+
+
+    const queue = [
+        startId
+    ];
+
+    const cameFrom =
+        new Map();
+
+
+    cameFrom.set(
+        startId,
+        null
+    );
+
+
+    while (
+        queue.length
     ) {
 
-        const angle =
-            randomBetween(
-                0,
-                Math.PI *
-                2
-            );
-
-        const radius =
-            Math.sqrt(
-                random()
-            ) *
-            13.5;
-
-
-        const x =
-            Math.cos(
-                angle
-            ) *
-            radius;
-
-        const z =
-            Math.sin(
-                angle
-            ) *
-            radius;
+        const current =
+            queue.shift();
 
 
         if (
-            !isInsideObstacle(
-                x,
-                z
-            )
+            current ===
+            destinationId
         ) {
+            break;
+        }
 
-            return new THREE.Vector3(
-                x,
-                0,
-                z
+
+        const neighbours =
+            WALK_LINKS[
+                current
+            ] ||
+            [];
+
+
+        neighbours.forEach(
+            (neighbour) => {
+
+                if (
+                    cameFrom.has(
+                        neighbour
+                    )
+                ) {
+                    return;
+                }
+
+
+                cameFrom.set(
+                    neighbour,
+                    current
+                );
+
+
+                queue.push(
+                    neighbour
+                );
+
+            }
+        );
+
+    }
+
+
+    if (
+        !cameFrom.has(
+            destinationId
+        )
+    ) {
+
+        return [
+            startId
+        ];
+
+    }
+
+
+    const route = [];
+
+    let current =
+        destinationId;
+
+
+    while (
+        current !==
+        null
+    ) {
+
+        route.push(
+            current
+        );
+
+
+        current =
+            cameFrom.get(
+                current
             );
 
+    }
+
+
+    route.reverse();
+
+
+    return route;
+
+}
+
+
+function chooseDifferentWalkNode(
+    currentId
+) {
+
+    if (
+        WALK_NODE_IDS.length <
+        2
+    ) {
+        return currentId;
+    }
+
+
+    let nextId =
+        currentId;
+
+
+    for (
+        let attempt = 0;
+        attempt < 20;
+        attempt += 1
+    ) {
+
+        nextId =
+            randomChoice(
+                WALK_NODE_IDS
+            );
+
+
+        if (
+            nextId !==
+            currentId
+        ) {
+            break;
         }
 
     }
 
 
+    return nextId;
+
+}
+
+
+function createNodeTarget(
+    nodeId,
+    laneSeed
+) {
+
+    const node =
+        WALK_NODES[
+            nodeId
+        ];
+
+
+    /*
+     * A small fixed lane offset prevents villagers
+     * from forming one perfect single-file line.
+     */
+
+    const laneAmount =
+        (
+            laneSeed -
+            0.5
+        ) *
+        0.5;
+
+
+    let x =
+        node.x;
+
+    let z =
+        node.z;
+
+
+    const links =
+        WALK_LINKS[
+            nodeId
+        ] ||
+        [];
+
+
+    if (
+        links.length
+    ) {
+
+        const neighbour =
+            WALK_NODES[
+                links[0]
+            ];
+
+
+        const dx =
+            neighbour.x -
+            node.x;
+
+        const dz =
+            neighbour.z -
+            node.z;
+
+        const length =
+            Math.max(
+                Math.hypot(
+                    dx,
+                    dz
+                ),
+                0.001
+            );
+
+
+        /*
+         * Perpendicular lane offset.
+         */
+
+        x +=
+            (
+                -dz /
+                length
+            ) *
+            laneAmount;
+
+        z +=
+            (
+                dx /
+                length
+            ) *
+            laneAmount;
+
+    }
+
+
+    /*
+     * Never allow the offset itself to put a waypoint
+     * inside a solid town asset.
+     */
+
+    if (
+        isInsideObstacle(
+            x,
+            z
+        )
+    ) {
+
+        x =
+            node.x;
+
+        z =
+            node.z;
+
+    }
+
+
     return new THREE.Vector3(
+        x,
         0,
-        0,
-        10
+        z
     );
+
+}
+
+
+function assignNewVillagerRoute(
+    villager
+) {
+
+    const data =
+        villager.userData;
+
+
+    const startId =
+        getNearestWalkNodeId(
+            villager.position
+        );
+
+
+    const destinationId =
+        chooseDifferentWalkNode(
+            startId
+        );
+
+
+    const route =
+        findWalkRoute(
+            startId,
+            destinationId
+        );
+
+
+    data.route =
+        route;
+
+    data.routeIndex =
+        route.length >
+        1
+            ? 1
+            : 0;
+
+    data.destinationNodeId =
+        destinationId;
+
+    data.target =
+        createNodeTarget(
+            route[
+                data.routeIndex
+            ],
+            data.laneSeed
+        );
 
 }
 
@@ -1692,11 +2183,16 @@ function createVillager(
         new THREE.Group();
 
 
+    const spawnNodeId =
+        randomChoice(
+            WALK_NODE_IDS
+        );
+
+
     group.userData = {
         id,
         category,
-        target:
-            chooseVillagerTarget(),
+
         speed:
             category ===
             "child"
@@ -1708,11 +2204,25 @@ function createVillager(
                     0.8,
                     1.15
                 ),
+
         phase:
             randomBetween(
                 0,
                 Math.PI *
                 2
+            ),
+
+        laneSeed:
+            random(),
+
+        route: [],
+        routeIndex: 0,
+        destinationNodeId:
+            spawnNodeId,
+
+        target:
+            getWalkNodeVector(
+                spawnNodeId
             )
     };
 
@@ -1930,7 +2440,14 @@ function createVillager(
 
 
     group.position.copy(
-        chooseVillagerTarget()
+        getWalkNodeVector(
+            spawnNodeId
+        )
+    );
+
+
+    assignNewVillagerRoute(
+        group
     );
 
 
@@ -1990,258 +2507,6 @@ function createVillagers(
 
 
     return villagers;
-
-}
-
-
-function avoidBuildingObstacles(
-    villager,
-    desiredDirection
-) {
-
-    const avoidance =
-        new THREE.Vector3();
-
-
-    BUILDING_OBSTACLES.forEach(
-        (obstacle) => {
-
-            const margin =
-                0.65;
-
-            const awareness =
-                2.3;
-
-            const minX =
-                obstacle.x -
-                obstacle.w / 2 -
-                margin;
-
-            const maxX =
-                obstacle.x +
-                obstacle.w / 2 +
-                margin;
-
-            const minZ =
-                obstacle.z -
-                obstacle.d / 2 -
-                margin;
-
-            const maxZ =
-                obstacle.z +
-                obstacle.d / 2 +
-                margin;
-
-
-            const closestX =
-                Math.max(
-                    minX,
-                    Math.min(
-                        villager.position.x,
-                        maxX
-                    )
-                );
-
-            const closestZ =
-                Math.max(
-                    minZ,
-                    Math.min(
-                        villager.position.z,
-                        maxZ
-                    )
-                );
-
-
-            const away =
-                new THREE.Vector3(
-                    villager.position.x -
-                        closestX,
-                    0,
-                    villager.position.z -
-                        closestZ
-                );
-
-
-            const distance =
-                away.length();
-
-
-            /*
-             * If the villager is somehow already inside
-             * the building collision box, push them toward
-             * the nearest edge immediately.
-             */
-
-            const inside =
-                villager.position.x >
-                    minX &&
-                villager.position.x <
-                    maxX &&
-                villager.position.z >
-                    minZ &&
-                villager.position.z <
-                    maxZ;
-
-
-            if (inside) {
-
-                const leftDist =
-                    villager.position.x -
-                    minX;
-
-                const rightDist =
-                    maxX -
-                    villager.position.x;
-
-                const topDist =
-                    villager.position.z -
-                    minZ;
-
-                const bottomDist =
-                    maxZ -
-                    villager.position.z;
-
-
-                const nearest =
-                    Math.min(
-                        leftDist,
-                        rightDist,
-                        topDist,
-                        bottomDist
-                    );
-
-
-                if (
-                    nearest ===
-                    leftDist
-                ) {
-
-                    avoidance.x -=
-                        4.0;
-
-                } else if (
-                    nearest ===
-                    rightDist
-                ) {
-
-                    avoidance.x +=
-                        4.0;
-
-                } else if (
-                    nearest ===
-                    topDist
-                ) {
-
-                    avoidance.z -=
-                        4.0;
-
-                } else {
-
-                    avoidance.z +=
-                        4.0;
-
-                }
-
-
-                return;
-            }
-
-
-            if (
-                distance >
-                awareness
-            ) {
-                return;
-            }
-
-
-            if (
-                distance <
-                0.001
-            ) {
-                return;
-            }
-
-
-            away.normalize();
-
-
-            /*
-             * Only steer if movement is actually taking
-             * the villager toward the building.
-             */
-
-            const towardBuilding =
-                desiredDirection.dot(
-                    away
-                        .clone()
-                        .multiplyScalar(
-                            -1
-                        )
-                );
-
-
-            if (
-                towardBuilding <=
-                0
-            ) {
-                return;
-            }
-
-
-            const tangentA =
-                new THREE.Vector3(
-                    -away.z,
-                    0,
-                    away.x
-                );
-
-            const tangentB =
-                tangentA
-                    .clone()
-                    .multiplyScalar(
-                        -1
-                    );
-
-
-            const tangent =
-                tangentA.dot(
-                    desiredDirection
-                ) >=
-                tangentB.dot(
-                    desiredDirection
-                )
-                    ? tangentA
-                    : tangentB;
-
-
-            const strength =
-                1 -
-                Math.min(
-                    1,
-                    distance /
-                    awareness
-                );
-
-
-            avoidance.addScaledVector(
-                tangent,
-                strength *
-                    2.6
-            );
-
-
-            avoidance.addScaledVector(
-                away,
-                strength *
-                    1.15
-            );
-
-        }
-    );
-
-
-    return avoidance;
 
 }
 
@@ -2356,156 +2621,6 @@ function keepOutsideBuildingObstacles(
 }
 
 
-function avoidCircularObstacles(
-    villager,
-    desiredDirection
-) {
-
-    const avoidance =
-        new THREE.Vector3();
-
-
-    CIRCULAR_OBSTACLES.forEach(
-        (obstacle) => {
-
-            const offset =
-                new THREE.Vector3(
-                    villager.position.x -
-                        obstacle.x,
-                    0,
-                    villager.position.z -
-                        obstacle.z
-                );
-
-            const distance =
-                offset.length();
-
-            const safeRadius =
-                obstacle.radius +
-                0.55;
-
-            const awarenessRadius =
-                safeRadius +
-                2.4;
-
-
-            if (
-                distance >
-                awarenessRadius
-            ) {
-                return;
-            }
-
-
-            if (
-                distance <
-                safeRadius
-            ) {
-
-                if (
-                    distance <
-                    0.001
-                ) {
-                    offset.set(
-                        1,
-                        0,
-                        0
-                    );
-                } else {
-                    offset.normalize();
-                }
-
-
-                avoidance.addScaledVector(
-                    offset,
-                    3.4 +
-                    (
-                        safeRadius -
-                        distance
-                    ) *
-                    2.2
-                );
-
-                return;
-            }
-
-
-            offset.normalize();
-
-
-            const tangentA =
-                new THREE.Vector3(
-                    -offset.z,
-                    0,
-                    offset.x
-                );
-
-            const tangentB =
-                tangentA
-                    .clone()
-                    .multiplyScalar(
-                        -1
-                    );
-
-            const tangent =
-                tangentA.dot(
-                    desiredDirection
-                ) >=
-                tangentB.dot(
-                    desiredDirection
-                )
-                    ? tangentA
-                    : tangentB;
-
-            const approachStrength =
-                1 -
-                (
-                    distance -
-                    safeRadius
-                ) /
-                (
-                    awarenessRadius -
-                    safeRadius
-                );
-
-            const towardWell =
-                desiredDirection.dot(
-                    offset
-                        .clone()
-                        .multiplyScalar(
-                            -1
-                        )
-                );
-
-
-            if (
-                towardWell >
-                0
-            ) {
-
-                avoidance.addScaledVector(
-                    tangent,
-                    approachStrength *
-                    2.4
-                );
-
-                avoidance.addScaledVector(
-                    offset,
-                    approachStrength *
-                    0.85
-                );
-
-            }
-
-        }
-    );
-
-
-    return avoidance;
-
-}
-
-
 function keepOutsideCircularObstacles(
     position
 ) {
@@ -2585,6 +2700,17 @@ function updateVillagers(
                 villager.userData;
 
 
+            if (
+                !data.target
+            ) {
+
+                assignNewVillagerRoute(
+                    villager
+                );
+
+            }
+
+
             const toTarget =
                 new THREE.Vector3()
                     .subVectors(
@@ -2599,43 +2725,42 @@ function updateVillagers(
 
             if (
                 distance <
-                0.45
+                0.34
             ) {
 
-                data.target =
-                    chooseVillagerTarget();
+                data.routeIndex +=
+                    1;
+
+
+                if (
+                    data.routeIndex >=
+                    data.route.length
+                ) {
+
+                    assignNewVillagerRoute(
+                        villager
+                    );
+
+                } else {
+
+                    data.target =
+                        createNodeTarget(
+                            data.route[
+                                data.routeIndex
+                            ],
+                            data.laneSeed
+                        );
+
+                }
+
 
                 return;
             }
 
 
-            toTarget.normalize();
-
-
-            const buildingAvoidance =
-                avoidBuildingObstacles(
-                    villager,
-                    toTarget
-                );
-
-
-            const circularAvoidance =
-                avoidCircularObstacles(
-                    villager,
-                    toTarget
-                );
-
-
             const moveDirection =
-                toTarget
-                    .clone()
-                    .add(
-                        buildingAvoidance
-                    )
-                    .add(
-                        circularAvoidance
-                    )
-                    .normalize();
+                toTarget.normalize();
+
 
             const nextPosition =
                 villager.position
@@ -2647,6 +2772,11 @@ function updateVillagers(
                     );
 
 
+            /*
+             * The route network is the primary movement logic.
+             * These are only fail-safe collision clamps.
+             */
+
             keepOutsideBuildingObstacles(
                 nextPosition
             );
@@ -2657,11 +2787,41 @@ function updateVillagers(
             );
 
 
+            /*
+             * If a clamp significantly moved the villager,
+             * snap their route back to the nearest safe node.
+             * This avoids endless edge-sticking.
+             */
+
+            const movedByClamp =
+                nextPosition.distanceTo(
+                    villager.position
+                        .clone()
+                        .addScaledVector(
+                            moveDirection,
+                            data.speed *
+                            delta
+                        )
+                );
+
+
             villager.position.x =
                 nextPosition.x;
 
             villager.position.z =
                 nextPosition.z;
+
+
+            if (
+                movedByClamp >
+                0.18
+            ) {
+
+                assignNewVillagerRoute(
+                    villager
+                );
+
+            }
 
 
             villager.rotation.y =
@@ -2670,11 +2830,6 @@ function updateVillagers(
                     moveDirection.z
                 );
 
-
-            /*
-             * A tiny walking bob keeps the civilians
-             * alive without needing external animations.
-             */
 
             villager.position.y =
                 Math.abs(
