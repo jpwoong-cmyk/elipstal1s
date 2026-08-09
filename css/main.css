@@ -333,198 +333,6 @@ body {
 
 
 /* ================================
-   TABLET
-================================ */
-
-@media (max-width: 1000px) {
-
-    .main-menu {
-        padding-left: 50px;
-    }
-
-
-    .game-title-logo {
-        width: min(
-            72vw,
-            680px
-        );
-
-        height: 260px;
-
-        object-fit: cover;
-        object-position: center 50%;
-    }
-
-
-    .menu-options {
-        margin-top: 40px;
-    }
-
-
-    .main-art {
-        right: -8vw;
-
-        width: 58vw;
-        height: 88%;
-    }
-
-}
-
-
-/* ================================
-   MOBILE
-================================ */
-
-@media (max-width: 700px) {
-
-    .main-screen {
-        min-height: 600px;
-    }
-
-
-    .main-menu {
-        padding-top: 55px;
-
-        padding-left: 24px;
-        padding-right: 20px;
-    }
-
-
-    .game-title-logo {
-        width: min(
-            96vw,
-            560px
-        );
-
-        height: 230px;
-
-        object-fit: cover;
-        object-position: center 50%;
-    }
-
-
-    .menu-options {
-        margin-top: 28px;
-
-        gap: 22px;
-
-        padding-left: 38px;
-    }
-
-
-    .menu-button {
-        font-size: 21px;
-    }
-
-
-    /*
-       Slightly smaller arrow on mobile
-    */
-
-    .menu-button::before {
-        left: -39px;
-
-        width: 29px;
-        height: 23px;
-    }
-
-
-    .menu-button::after {
-        left: -35px;
-
-        width: 22px;
-        height: 16px;
-    }
-
-
-    .main-art {
-        right: -18vw;
-
-        bottom: -3%;
-
-        width: 86vw;
-        height: 70%;
-
-        opacity: 0.82;
-    }
-
-}
-
-
-/* ================================
-   SMALL MOBILE
-================================ */
-
-@media (max-width: 440px) {
-
-    .main-menu {
-        padding-left: 20px;
-    }
-
-
-    .game-title-logo {
-        width: 98vw;
-
-        height: 210px;
-
-        object-fit: cover;
-        object-position: center 50%;
-    }
-
-
-    .menu-options {
-        margin-top: 22px;
-
-        padding-left: 36px;
-    }
-
-
-    .menu-button {
-        font-size: 19px;
-    }
-
-
-    .menu-button::before {
-        left: -37px;
-
-        width: 27px;
-        height: 21px;
-    }
-
-
-    .menu-button::after {
-        left: -33px;
-
-        width: 20px;
-        height: 15px;
-    }
-
-
-    .main-art {
-        right: -28vw;
-
-        width: 105vw;
-        height: 66%;
-    }
-
-}
-
-
-/* ================================
-   REDUCED MOTION
-================================ */
-
-@media (prefers-reduced-motion: reduce) {
-
-    .menu-button,
-    .menu-button::before,
-    .menu-button::after {
-        transition: none;
-    }
-
-}
-
-/* ================================
    CHANGEABLE MENU CONTENT
 ================================ */
 
@@ -683,59 +491,127 @@ body {
 
 
 /* ================================
-   SEAL HOLD BUTTON
+   DARK SILVER SIGIL BUTTON
 ================================ */
 
 .seal-hold-button {
     position: relative;
-
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 255px;
     margin-top: 28px;
-
-    padding:
-        8px
-        0;
-
-    border: 0;
-
-    background:
-        transparent;
-
-    color: #d9dde0;
-
-    font: inherit;
-
-    font-size: clamp(
-        17px,
-        1.4vw,
-        22px
+    padding: 13px 34px;
+    border: 1px solid rgba(185, 192, 198, 0.6);
+    background: linear-gradient(
+        to bottom,
+        rgba(34, 37, 40, 0.96) 0%,
+        rgba(15, 17, 19, 0.98) 52%,
+        rgba(5, 6, 7, 1) 100%
     );
-
-    letter-spacing:
-        0.06em;
-
+    color: #d9dde0;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(16px, 1.25vw, 20px);
+    font-weight: 400;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
     cursor: pointer;
-
+    clip-path: polygon(
+        10px 0,
+        calc(100% - 10px) 0,
+        100% 10px,
+        100% calc(100% - 10px),
+        calc(100% - 10px) 100%,
+        10px 100%,
+        0 calc(100% - 10px),
+        0 10px
+    );
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.09),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.9),
+        0 0 0 1px rgba(55, 60, 64, 0.7),
+        0 5px 18px rgba(0, 0, 0, 0.55);
+    text-shadow:
+        0 1px 0 #000,
+        0 0 6px rgba(220, 225, 230, 0.13);
     transition:
-        color
-        180ms ease,
-        transform
-        180ms ease;
+        color 220ms ease,
+        border-color 220ms ease,
+        box-shadow 220ms ease,
+        transform 160ms ease;
 }
 
+.seal-hold-button::before {
+    content: "◆";
+    position: absolute;
+    left: -18px;
+    top: 50%;
+    transform: translateY(-50%) scaleX(0.75);
+    color: #8d969c;
+    font-size: 18px;
+    text-shadow: 0 0 5px rgba(210, 218, 224, 0.2);
+    transition: color 220ms ease, text-shadow 220ms ease;
+}
+
+.seal-hold-button::after {
+    content: "◆";
+    position: absolute;
+    right: -18px;
+    top: 50%;
+    transform: translateY(-50%) scaleX(0.75);
+    color: #8d969c;
+    font-size: 18px;
+    text-shadow: 0 0 5px rgba(210, 218, 224, 0.2);
+    transition: color 220ms ease, text-shadow 220ms ease;
+}
 
 .seal-hold-button:hover,
 .seal-hold-button:focus-visible {
     color: #fff;
-
-    transform:
-        translateX(6px);
-}
-
-
-.seal-hold-button:focus-visible {
+    border-color: rgba(225, 230, 234, 0.92);
+    transform: translateY(-1px);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.15),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.95),
+        0 0 0 1px rgba(105, 113, 119, 0.7),
+        0 0 12px rgba(190, 200, 208, 0.15),
+        0 7px 20px rgba(0, 0, 0, 0.6);
     outline: none;
 }
 
+.seal-hold-button:hover::before,
+.seal-hold-button:hover::after,
+.seal-hold-button:focus-visible::before,
+.seal-hold-button:focus-visible::after {
+    color: #c6cdd1;
+    text-shadow: 0 0 8px rgba(225, 232, 236, 0.45);
+}
+
+.seal-hold-button:active {
+    transform: translateY(1px);
+    background: linear-gradient(
+        to bottom,
+        rgba(13, 15, 17, 1) 0%,
+        rgba(26, 29, 32, 1) 100%
+    );
+    box-shadow:
+        inset 0 2px 6px rgba(0, 0, 0, 0.8),
+        0 0 0 1px rgba(130, 137, 142, 0.5);
+}
+
+.seal-hold-button:disabled {
+    cursor: default;
+    color: rgba(185, 190, 194, 0.38);
+    border-color: rgba(130, 136, 141, 0.25);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    transform: none;
+}
+
+.seal-hold-button:disabled::before,
+.seal-hold-button:disabled::after {
+    color: rgba(135, 140, 144, 0.28);
+    text-shadow: none;
+}
 
 /* ================================
    ERROR
@@ -1002,6 +878,248 @@ body {
 
     to {
         opacity: 1;
+    }
+
+}
+
+
+/* ================================
+   RESPONSIVE / ACCESSIBILITY
+================================ */
+
+@media (max-width: 1000px) {
+
+    .main-menu {
+        padding-left: 50px;
+    }
+
+
+    .game-title-logo {
+        width: min(
+            72vw,
+            680px
+        );
+
+        height: 260px;
+
+        object-fit: cover;
+        object-position: center 50%;
+    }
+
+
+    .menu-options {
+        margin-top: 40px;
+    }
+
+
+    .main-art {
+        right: -8vw;
+
+        width: 58vw;
+        height: 88%;
+    }
+
+}
+
+
+@media (max-width: 700px) {
+
+    .main-screen {
+        min-height: 600px;
+    }
+
+
+    .main-menu {
+        padding-top: 55px;
+
+        padding-left: 24px;
+        padding-right: 20px;
+    }
+
+
+    .game-title-logo {
+        width: min(
+            96vw,
+            560px
+        );
+
+        height: 230px;
+
+        object-fit: cover;
+        object-position: center 50%;
+    }
+
+
+    .menu-options {
+        margin-top: 28px;
+
+        gap: 22px;
+
+        padding-left: 38px;
+    }
+
+
+    .menu-button {
+        font-size: 21px;
+    }
+
+
+    /*
+       Slightly smaller arrow on mobile
+    */
+
+    .menu-button::before {
+        left: -39px;
+
+        width: 29px;
+        height: 23px;
+    }
+
+
+    .menu-button::after {
+        left: -35px;
+
+        width: 22px;
+        height: 16px;
+    }
+
+
+    .main-art {
+        right: -18vw;
+
+        bottom: -3%;
+
+        width: 86vw;
+        height: 70%;
+
+        opacity: 0.82;
+    }
+
+/* Establish Hold mobile */
+
+    .hold-panel {
+        margin-top: 26px;
+    }
+
+    .hold-name-input {
+        width: min(58vw, 260px);
+    }
+
+    .seal-hold-button {
+        min-width: 215px;
+        padding: 11px 25px;
+        font-size: 15px;
+        letter-spacing: 0.1em;
+    }
+
+    .seal-hold-button::before {
+        left: -15px;
+        font-size: 15px;
+    }
+
+    .seal-hold-button::after {
+        right: -15px;
+        font-size: 15px;
+    }
+
+    .seal-forging-text {
+        margin-top: 25px;
+        font-size: 15px;
+    }
+
+    .generated-seal {
+        margin-top: 18px;
+        font-size: 32px;
+    }
+
+    .seal-warning {
+        max-width: 290px;
+        font-size: 14px;
+    }
+
+}
+
+
+@media (max-width: 440px) {
+
+    .main-menu {
+        padding-left: 20px;
+    }
+
+
+    .game-title-logo {
+        width: 98vw;
+
+        height: 210px;
+
+        object-fit: cover;
+        object-position: center 50%;
+    }
+
+
+    .menu-options {
+        margin-top: 22px;
+
+        padding-left: 36px;
+    }
+
+
+    .menu-button {
+        font-size: 19px;
+    }
+
+
+    .menu-button::before {
+        left: -37px;
+
+        width: 27px;
+        height: 21px;
+    }
+
+
+    .menu-button::after {
+        left: -33px;
+
+        width: 20px;
+        height: 15px;
+    }
+
+
+    .main-art {
+        right: -28vw;
+
+        width: 105vw;
+        height: 66%;
+    }
+
+/* Establish Hold small mobile */
+
+    .hold-name-input {
+        width: min(62vw, 240px);
+    }
+
+    .seal-hold-button {
+        min-width: 195px;
+        padding: 10px 21px;
+        font-size: 14px;
+        letter-spacing: 0.085em;
+    }
+
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+
+    .menu-button,
+    .menu-button::before,
+    .menu-button::after {
+        transition: none;
+    }
+
+.seal-hold-button,
+    .seal-hold-button::before,
+    .seal-hold-button::after {
+        transition: none;
     }
 
 }
