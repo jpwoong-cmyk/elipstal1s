@@ -2795,6 +2795,198 @@ function snapVillagerToNavigation(
 }
 
 
+function createHairStyle(
+    category,
+    headRadius,
+    hairMaterial
+) {
+
+    const hairGroup =
+        new THREE.Group();
+
+
+    const maleStyles = [
+        "short",
+        "side",
+        "crop"
+    ];
+
+    const femaleStyles = [
+        "bob",
+        "long",
+        "bun"
+    ];
+
+    const childStyles = [
+        "short",
+        "bob",
+        "crop",
+        "side"
+    ];
+
+
+    const style =
+        randomChoice(
+            category === "male"
+                ? maleStyles
+                : category === "female"
+                  ? femaleStyles
+                  : childStyles
+        );
+
+
+    const cap =
+        new THREE.Mesh(
+            new THREE.SphereGeometry(
+                headRadius * 1.045,
+                12,
+                8,
+                0,
+                Math.PI * 2,
+                0,
+                Math.PI / 2
+            ),
+            hairMaterial
+        );
+
+
+    cap.position.y =
+        headRadius * 0.31;
+
+
+    hairGroup.add(cap);
+
+
+    if (style === "side") {
+
+        const sideHair =
+            new THREE.Mesh(
+                new THREE.BoxGeometry(
+                    headRadius * 0.42,
+                    headRadius * 0.85,
+                    headRadius * 1.15
+                ),
+                hairMaterial
+            );
+
+
+        sideHair.position.set(
+            -headRadius * 0.72,
+            -headRadius * 0.02,
+            0
+        );
+
+
+        hairGroup.add(sideHair);
+    }
+
+
+    if (style === "crop") {
+
+        cap.scale.set(
+            1.0,
+            0.72,
+            1.0
+        );
+
+        cap.position.y =
+            headRadius * 0.42;
+    }
+
+
+    if (style === "bob") {
+
+        const back =
+            new THREE.Mesh(
+                new THREE.SphereGeometry(
+                    headRadius * 1.04,
+                    12,
+                    8
+                ),
+                hairMaterial
+            );
+
+
+        back.scale.set(
+            0.96,
+            1.08,
+            0.84
+        );
+
+        back.position.set(
+            0,
+            -headRadius * 0.16,
+            -headRadius * 0.28
+        );
+
+
+        hairGroup.add(back);
+    }
+
+
+    if (style === "long") {
+
+        const backHair =
+            new THREE.Mesh(
+                new THREE.CapsuleGeometry(
+                    headRadius * 0.66,
+                    headRadius * 1.4,
+                    4,
+                    8
+                ),
+                hairMaterial
+            );
+
+
+        backHair.scale.set(
+            1.1,
+            1.0,
+            0.68
+        );
+
+        backHair.position.set(
+            0,
+            -headRadius * 1.06,
+            -headRadius * 0.39
+        );
+
+
+        hairGroup.add(backHair);
+    }
+
+
+    if (style === "bun") {
+
+        const bun =
+            new THREE.Mesh(
+                new THREE.SphereGeometry(
+                    headRadius * 0.46,
+                    10,
+                    7
+                ),
+                hairMaterial
+            );
+
+
+        bun.position.set(
+            0,
+            headRadius * 0.82,
+            -headRadius * 0.48
+        );
+
+
+        hairGroup.add(bun);
+    }
+
+
+    hairGroup.userData.style =
+        style;
+
+
+    return hairGroup;
+}
+
+
 function createVillager(
     id,
     category
@@ -2810,45 +3002,8 @@ function createVillager(
         );
 
 
-    group.userData = {
-        id,
-        category,
-
-        speed:
-            category ===
-            "child"
-                ? randomBetween(
-                    1.15,
-                    1.5
-                )
-                : randomBetween(
-                    0.8,
-                    1.15
-                ),
-
-        phase:
-            randomBetween(
-                0,
-                Math.PI *
-                2
-            ),
-
-        laneSeed:
-            random(),
-
-        pathPoints: [],
-        pathIndex: 0,
-        target: null,
-
-        stuckTime: 0,
-        lastXZ:
-            new THREE.Vector2()
-    };
-
-
     const child =
-        category ===
-        "child";
+        category === "child";
 
 
     const bodyScale =
@@ -2864,18 +3019,20 @@ function createVillager(
 
     const hair =
         makeMaterial(
-            PALETTE.hair
+            category === "female"
+                ? 0x3f2d28
+                : category === "male"
+                  ? 0x251d19
+                  : 0x37271f
         );
 
 
     const clothColor =
-        category ===
-        "male"
+        category === "male"
             ? PALETTE.maleCloth
-            : category ===
-              "female"
-                ? PALETTE.femaleCloth
-                : PALETTE.childCloth;
+            : category === "female"
+              ? PALETTE.femaleCloth
+              : PALETTE.childCloth;
 
 
     const cloth =
@@ -2883,97 +3040,148 @@ function createVillager(
             clothColor
         );
 
+    const trouserMaterial =
+        makeMaterial(
+            category === "female"
+                ? 0x4f3d4d
+                : 0x383331
+        );
 
-    const torsoGeometry =
-        category ===
-        "female"
-            ? new THREE.ConeGeometry(
-                0.42,
-                1.2,
-                9
-            )
-            : new THREE.CapsuleGeometry(
-                0.34,
-                0.62,
-                4,
-                8
-            );
+    const bootMaterial =
+        makeMaterial(
+            0x211d1a
+        );
 
 
     const torso =
         new THREE.Mesh(
-            torsoGeometry,
+            category === "female"
+                ? new THREE.CylinderGeometry(
+                    0.36 * bodyScale,
+                    0.52 * bodyScale,
+                    1.05 * bodyScale,
+                    9
+                )
+                : new THREE.CapsuleGeometry(
+                    0.31 * bodyScale,
+                    0.52 * bodyScale,
+                    4,
+                    8
+                ),
             cloth
         );
 
 
     torso.position.y =
-        1.24 *
-        bodyScale;
-
-    torso.scale.setScalar(
-        bodyScale
-    );
+        1.34 * bodyScale;
 
 
-    if (
-        category ===
-        "female"
-    ) {
-        torso.position.y =
-            1.18;
+    group.add(torso);
+
+
+    if (category === "female") {
+
+        const skirt =
+            new THREE.Mesh(
+                new THREE.CylinderGeometry(
+                    0.44 * bodyScale,
+                    0.60 * bodyScale,
+                    0.72 * bodyScale,
+                    10
+                ),
+                cloth
+            );
+
+
+        skirt.position.y =
+            0.76 * bodyScale;
+
+
+        group.add(skirt);
     }
 
 
-    const head =
+    const neck =
         new THREE.Mesh(
-            new THREE.SphereGeometry(
-                0.32 *
-                bodyScale,
-                12,
+            new THREE.CylinderGeometry(
+                0.12 * bodyScale,
+                0.13 * bodyScale,
+                0.18 * bodyScale,
                 8
             ),
             skin
         );
 
 
-    head.position.y =
-        2.18 *
-        bodyScale;
+    neck.position.y =
+        1.95 * bodyScale;
 
 
-    const hairCap =
+    group.add(neck);
+
+
+    const headRadius =
+        0.30 * bodyScale;
+
+
+    const head =
         new THREE.Mesh(
             new THREE.SphereGeometry(
-                0.335 *
-                bodyScale,
-                12,
-                8,
-                0,
-                Math.PI *
-                2,
-                0,
-                Math.PI /
-                2.0
+                headRadius,
+                14,
+                10
             ),
+            skin
+        );
+
+
+    head.position.y =
+        2.22 * bodyScale;
+
+
+    group.add(head);
+
+
+    const hairStyle =
+        createHairStyle(
+            category,
+            headRadius,
             hair
         );
 
 
-    hairCap.position.y =
-        2.29 *
-        bodyScale;
+    hairStyle.position.y =
+        2.22 * bodyScale;
 
 
-    group.add(
-        torso,
-        head,
-        hairCap
+    group.add(hairStyle);
+
+
+    const nose =
+        new THREE.Mesh(
+            new THREE.ConeGeometry(
+                0.055 * bodyScale,
+                0.13 * bodyScale,
+                6
+            ),
+            skin
+        );
+
+
+    nose.rotation.x =
+        Math.PI / 2;
+
+    nose.position.set(
+        0,
+        2.20 * bodyScale,
+        0.30 * bodyScale
     );
 
 
-    const limbMaterial =
-        cloth;
+    group.add(nose);
+
+
+    const legPivots = [];
 
 
     for (
@@ -2983,77 +3191,195 @@ function createVillager(
         ]
     ) {
 
-        const leg =
-            new THREE.Mesh(
-                new THREE.CylinderGeometry(
-                    0.09 *
-                    bodyScale,
-                    0.095 *
-                    bodyScale,
-                    0.78 *
-                    bodyScale,
-                    7
-                ),
-                makeMaterial(
-                    0x352f2c
-                )
-            );
+        const legPivot =
+            new THREE.Group();
 
 
-        leg.position.set(
-            0.16 *
-            side *
-            bodyScale,
-            0.42 *
-            bodyScale,
+        legPivot.position.set(
+            0.16 * side * bodyScale,
+            0.66 * bodyScale,
             0
         );
 
 
+        const leg =
+            new THREE.Mesh(
+                new THREE.CylinderGeometry(
+                    0.085 * bodyScale,
+                    0.095 * bodyScale,
+                    0.64 * bodyScale,
+                    7
+                ),
+                trouserMaterial
+            );
+
+
+        leg.position.y =
+            -0.31 * bodyScale;
+
+
+        const boot =
+            new THREE.Mesh(
+                new THREE.BoxGeometry(
+                    0.18 * bodyScale,
+                    0.18 * bodyScale,
+                    0.30 * bodyScale
+                ),
+                bootMaterial
+            );
+
+
+        boot.position.set(
+            0,
+            -0.65 * bodyScale,
+            0.07 * bodyScale
+        );
+
+
+        legPivot.add(
+            leg,
+            boot
+        );
+
+
         group.add(
-            leg
+            legPivot
+        );
+
+
+        legPivots.push(
+            legPivot
+        );
+    }
+
+
+    const armPivots = [];
+
+
+    for (
+        const side of [
+            -1,
+            1
+        ]
+    ) {
+
+        const armPivot =
+            new THREE.Group();
+
+
+        armPivot.position.set(
+            0.41 * side * bodyScale,
+            1.58 * bodyScale,
+            0
         );
 
 
         const arm =
             new THREE.Mesh(
                 new THREE.CylinderGeometry(
-                    0.075 *
-                    bodyScale,
-                    0.075 *
-                    bodyScale,
-                    0.74 *
-                    bodyScale,
+                    0.07 * bodyScale,
+                    0.075 * bodyScale,
+                    0.63 * bodyScale,
                     7
                 ),
-                limbMaterial
+                cloth
             );
 
 
-        arm.position.set(
-            0.43 *
-            side *
-            bodyScale,
-            1.35 *
-            bodyScale,
-            0
-        );
+        arm.position.y =
+            -0.29 * bodyScale;
 
-        arm.rotation.z =
-            side *
-            0.15;
+
+        const hand =
+            new THREE.Mesh(
+                new THREE.SphereGeometry(
+                    0.09 * bodyScale,
+                    8,
+                    6
+                ),
+                skin
+            );
+
+
+        hand.position.y =
+            -0.64 * bodyScale;
+
+
+        armPivot.rotation.z =
+            side * 0.10;
+
+
+        armPivot.add(
+            arm,
+            hand
+        );
 
 
         group.add(
-            arm
+            armPivot
         );
 
+
+        armPivots.push(
+            armPivot
+        );
     }
+
+
+    group.userData = {
+        id,
+        category,
+
+        speed:
+            child
+                ? randomBetween(
+                    1.15,
+                    1.5
+                )
+                : randomBetween(
+                    0.8,
+                    1.15
+                ),
+
+        phase:
+            randomBetween(
+                0,
+                Math.PI * 2
+            ),
+
+        laneSeed:
+            random(),
+
+        pathPoints: [],
+        pathIndex: 0,
+        target: null,
+
+        stuckTime: 0,
+        lastXZ:
+            new THREE.Vector2(),
+
+        leftLeg:
+            legPivots[0],
+
+        rightLeg:
+            legPivots[1],
+
+        leftArm:
+            armPivots[0],
+
+        rightArm:
+            armPivots[1],
+
+        hairStyle:
+            hairStyle.userData.style,
+
+        walkIntensity: 0
+    };
 
 
     group.scale.setScalar(
         child
-            ? 0.9
+            ? 0.92
             : 1
     );
 
@@ -3078,7 +3404,6 @@ function createVillager(
 
 
     return group;
-
 }
 
 
@@ -3424,6 +3749,69 @@ function updateVillagers(
                 );
 
 
+            const walkCycle =
+                elapsed *
+                (
+                    6.2 +
+                    data.speed *
+                    1.6
+                ) +
+                data.phase;
+
+
+            data.walkIntensity +=
+                (
+                    1 -
+                    data.walkIntensity
+                ) *
+                Math.min(
+                    1,
+                    delta *
+                    9
+                );
+
+
+            const legSwing =
+                Math.sin(
+                    walkCycle
+                ) *
+                0.48 *
+                data.walkIntensity;
+
+            const armSwing =
+                Math.sin(
+                    walkCycle
+                ) *
+                0.34 *
+                data.walkIntensity;
+
+
+            if (
+                data.leftLeg &&
+                data.rightLeg
+            ) {
+
+                data.leftLeg.rotation.x =
+                    legSwing;
+
+                data.rightLeg.rotation.x =
+                    -legSwing;
+            }
+
+
+            if (
+                data.leftArm &&
+                data.rightArm
+            ) {
+
+                data.leftArm.rotation.x =
+                    -armSwing;
+
+                data.rightArm.rotation.x =
+                    armSwing;
+            }
+
+
             /*
              * Stuck watchdog.
              *
@@ -3487,13 +3875,11 @@ function updateVillagers(
             villager.position.y =
                 Math.abs(
                     Math.sin(
-                        elapsed *
-                        6 *
-                        data.speed +
-                        data.phase
+                        walkCycle * 2
                     )
                 ) *
-                0.035;
+                0.018 *
+                data.walkIntensity;
 
         }
     );
