@@ -826,11 +826,22 @@ body {
 
 
 /* ================================
-   RETURN BUTTON
+   ESTABLISH HOLD ACTIONS
 ================================ */
 
-.hold-return-button {
+.hold-actions {
+    display: flex;
+
+    align-items: center;
+
+    gap: 22px;
+
     margin-top: 28px;
+}
+
+
+.hold-return-button {
+    margin: 0;
 
     padding: 0;
 
@@ -852,34 +863,88 @@ body {
 
     cursor: pointer;
 
-    opacity: 0;
+    opacity: 1;
 
     transition:
-        color
-        180ms ease;
+        color 180ms ease;
 }
 
 
-.hold-return-button.is-visible {
-    animation:
-        returnButtonAppear
-        1.2s
-        ease
-        forwards;
-}
-
-
-.hold-return-button:hover {
+.hold-return-button:hover,
+.hold-return-button:focus-visible {
     color: #fff;
+
+    outline: none;
 }
 
 
-@keyframes returnButtonAppear {
+.enter-created-hold-button {
+    padding: 0;
 
-    to {
-        opacity: 1;
-    }
+    border: 0;
 
+    background: transparent;
+
+    color:
+        rgba(
+            220,
+            223,
+            225,
+            0
+        );
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size: 16px;
+
+    font-style: italic;
+
+    letter-spacing: 0.04em;
+
+    cursor: default;
+
+    pointer-events: none;
+
+    opacity: 0;
+
+    transform:
+        translateX(-6px);
+
+    transition:
+        opacity 700ms ease,
+        transform 700ms ease,
+        color 180ms ease;
+}
+
+
+.enter-created-hold-button.is-visible {
+    color:
+        rgba(
+            225,
+            228,
+            230,
+            0.88
+        );
+
+    opacity: 1;
+
+    transform:
+        translateX(0);
+
+    pointer-events: auto;
+
+    cursor: pointer;
+}
+
+
+.enter-created-hold-button.is-visible:hover,
+.enter-created-hold-button.is-visible:focus-visible {
+    color: #fff;
+
+    outline: none;
 }
 
 
@@ -1574,6 +1639,19 @@ body {
         font-size: 19px;
     }
 
+
+
+.hold-actions {
+        gap: 18px;
+
+        margin-top: 22px;
+    }
+
+    .hold-return-button,
+    .enter-created-hold-button {
+        font-size: 15px;
+    }
+
 }
 
 
@@ -1660,6 +1738,17 @@ body {
         font-size: 21px;
     }
 
+
+
+.hold-actions {
+        gap: 16px;
+    }
+
+    .hold-return-button,
+    .enter-created-hold-button {
+        font-size: 14px;
+    }
+
 }
 
 
@@ -1686,6 +1775,13 @@ body {
 
     .seal-slot.is-inscribed {
         animation: none;
+    }
+
+
+
+.hold-return-button,
+    .enter-created-hold-button {
+        transition: none;
     }
 
 }

@@ -381,10 +381,23 @@ if (menuContent) {
 
             if (
                 event.target.closest(
+                    "#enterCreatedHoldButton"
+                )
+            ) {
+                enterCreatedHold();
+
+                return;
+            }
+
+
+            if (
+                event.target.closest(
                     "#holdReturnButton"
                 )
             ) {
                 showMainMenu();
+
+                return;
             }
 
         }
@@ -514,13 +527,25 @@ function showEstablishHold() {
             </div>
 
 
-            <button
-                id="holdReturnButton"
-                class="hold-return-button"
-                type="button"
-            >
-                Return
-            </button>
+            <div class="hold-actions">
+
+                <button
+                    id="holdReturnButton"
+                    class="hold-return-button"
+                    type="button"
+                >
+                    Return
+                </button>
+
+                <button
+                    id="enterCreatedHoldButton"
+                    class="enter-created-hold-button"
+                    type="button"
+                >
+                    Enter Your Hold
+                </button>
+
+            </div>
 
         </div>
     `;
@@ -533,6 +558,25 @@ function showEstablishHold() {
     requestAnimationFrame(
         () => holdName?.focus()
     );
+
+}
+
+
+/* ========================================
+   ENTER CREATED HOLD
+======================================== */
+
+function enterCreatedHold() {
+
+    /*
+     * The Hold has been created and its Seal
+     * has already been forged.
+     *
+     * Add the game-page navigation here once
+     * the destination page is ready.
+     */
+
+    console.log("Enter Your Hold selected");
 
 }
 
@@ -805,11 +849,6 @@ function forgeSeal() {
             "sealWarning"
         );
 
-    const returnButton =
-        document.getElementById(
-            "holdReturnButton"
-        );
-
     const sealButton =
         document.getElementById(
             "sealHoldButton"
@@ -912,13 +951,18 @@ function forgeSeal() {
 
 
     /*
-     * Finally allow return.
+     * Finally reveal the path into the Hold.
      */
 
     window.setTimeout(
         () => {
 
-            returnButton.classList.add(
+            const enterButton =
+                document.getElementById(
+                    "enterCreatedHoldButton"
+                );
+
+            enterButton?.classList.add(
                 "is-visible"
             );
 
