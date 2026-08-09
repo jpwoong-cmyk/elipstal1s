@@ -887,6 +887,506 @@ body {
    RESPONSIVE / ACCESSIBILITY
 ================================ */
 
+/* ================================
+   RETURN TO HOLD
+================================ */
+
+.return-hold-panel {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    width: 100%;
+
+    margin-top: clamp(
+        38px,
+        6vh,
+        65px
+    );
+
+    opacity: 0;
+
+    transform:
+        translateY(10px);
+
+    animation:
+        holdPanelEnter
+        700ms
+        ease
+        forwards;
+}
+
+
+/* ================================
+   RETURN SEAL TITLE
+================================ */
+
+.return-seal-title {
+    margin-top: 24px;
+    margin-bottom: 12px;
+
+    color: #d5d7da;
+
+    font-size: clamp(
+        16px,
+        1.2vw,
+        20px
+    );
+
+    letter-spacing: 0.08em;
+}
+
+
+/* ================================
+   SEAL DIGIT SLOTS
+================================ */
+
+.seal-slots {
+    display: flex;
+
+    gap: 12px;
+
+    margin-bottom: 22px;
+}
+
+
+.seal-slot {
+    position: relative;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 48px;
+    height: 52px;
+
+    border:
+        1px solid
+        rgba(
+            168,
+            174,
+            180,
+            0.38
+        );
+
+    background:
+        linear-gradient(
+            to bottom,
+            rgba(28, 30, 32, 0.85),
+            rgba(7, 8, 9, 0.92)
+        );
+
+    color: #d8dde0;
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size: 28px;
+
+    clip-path: polygon(
+        7px 0,
+        calc(100% - 7px) 0,
+        100% 7px,
+        100% calc(100% - 7px),
+        calc(100% - 7px) 100%,
+        7px 100%,
+        0 calc(100% - 7px),
+        0 7px
+    );
+
+    text-shadow:
+        0 0 7px
+        rgba(
+            215,
+            222,
+            228,
+            0.18
+        );
+}
+
+
+.seal-slot::after {
+    content: "◇";
+
+    position: absolute;
+
+    bottom: -7px;
+
+    color:
+        rgba(
+            153,
+            159,
+            164,
+            0.55
+        );
+
+    font-size: 11px;
+}
+
+
+.seal-slot.is-inscribed {
+    animation:
+        sealInscription
+        420ms
+        ease;
+}
+
+
+@keyframes sealInscription {
+
+    0% {
+        color: #fff;
+
+        text-shadow:
+            0 0 18px
+            rgba(
+                230,
+                235,
+                240,
+                0.85
+            );
+
+        transform:
+            scale(1.07);
+    }
+
+    100% {
+        color: #d8dde0;
+
+        text-shadow:
+            0 0 7px
+            rgba(
+                215,
+                222,
+                228,
+                0.18
+            );
+
+        transform:
+            scale(1);
+    }
+
+}
+
+
+/* ================================
+   DARK VELLUM LEDGER
+================================ */
+
+.seal-ledger {
+    position: relative;
+
+    width: 300px;
+
+    padding:
+        20px
+        22px
+        22px;
+
+    background:
+        radial-gradient(
+            ellipse at center,
+            rgba(42, 42, 39, 0.94) 0%,
+            rgba(23, 23, 21, 0.97) 58%,
+            rgba(8, 8, 8, 0.98) 100%
+        );
+
+    border:
+        1px solid
+        rgba(
+            157,
+            162,
+            166,
+            0.36
+        );
+
+    clip-path: polygon(
+        4% 0,
+        13% 2%,
+        24% 0,
+        38% 2%,
+        54% 0,
+        68% 2%,
+        83% 0,
+        96% 2%,
+        100% 9%,
+        98% 25%,
+        100% 42%,
+        98% 61%,
+        100% 82%,
+        96% 100%,
+        81% 98%,
+        67% 100%,
+        51% 98%,
+        34% 100%,
+        19% 98%,
+        5% 100%,
+        0 92%,
+        2% 72%,
+        0 53%,
+        2% 34%,
+        0 15%
+    );
+
+    box-shadow:
+        inset 0 0 30px
+        rgba(0, 0, 0, 0.85),
+        inset 0 0 0 2px
+        rgba(180, 185, 188, 0.05),
+        0 12px 30px
+        rgba(0, 0, 0, 0.5);
+}
+
+
+.seal-ledger::before {
+    content: "";
+
+    position: absolute;
+
+    inset: 8px;
+
+    border:
+        1px solid
+        rgba(
+            170,
+            175,
+            180,
+            0.13
+        );
+
+    pointer-events: none;
+}
+
+
+/* ================================
+   LEDGER INSTRUCTION
+================================ */
+
+.seal-ledger-mark {
+    position: relative;
+
+    margin-bottom: 18px;
+
+    text-align: center;
+
+    color:
+        rgba(
+            187,
+            190,
+            191,
+            0.52
+        );
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size: 11px;
+
+    font-style: italic;
+
+    letter-spacing: 0.04em;
+}
+
+
+/* ================================
+   NUMBER PAD
+================================ */
+
+.seal-keypad {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            3,
+            1fr
+        );
+
+    gap:
+        7px
+        12px;
+}
+
+
+.seal-key {
+    position: relative;
+
+    height: 39px;
+
+    border: 0;
+
+    background:
+        transparent;
+
+    color:
+        rgba(
+            210,
+            211,
+            208,
+            0.75
+        );
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size: 21px;
+
+    cursor: pointer;
+
+    transition:
+        color 150ms ease,
+        text-shadow 150ms ease,
+        transform 150ms ease;
+}
+
+
+.seal-key:hover,
+.seal-key:focus-visible {
+    color: #f1f2f0;
+
+    text-shadow:
+        0 0 10px
+        rgba(
+            225,
+            230,
+            233,
+            0.45
+        );
+
+    outline: none;
+}
+
+
+.seal-key.is-pressed {
+    color: #fff;
+
+    transform:
+        scale(1.15);
+
+    text-shadow:
+        0 0 15px
+        rgba(
+            235,
+            239,
+            242,
+            0.85
+        );
+}
+
+
+.seal-key-command {
+    color:
+        rgba(
+            162,
+            169,
+            174,
+            0.65
+        );
+
+    font-size: 25px;
+}
+
+
+.seal-key-enter:disabled {
+    opacity: 0.18;
+
+    cursor: default;
+
+    text-shadow: none;
+}
+
+
+.seal-key-enter:not(:disabled) {
+    color: #d5dbde;
+
+    text-shadow:
+        0 0 8px
+        rgba(
+            215,
+            222,
+            226,
+            0.24
+        );
+}
+
+
+/* ================================
+   RETURN HOLD MESSAGE
+================================ */
+
+.return-hold-message {
+    min-height: 20px;
+
+    margin-top: 13px;
+
+    color:
+        rgba(
+            190,
+            195,
+            198,
+            0.75
+        );
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size: 14px;
+
+    font-style: italic;
+}
+
+
+/* ================================
+   RETURN TO MAIN MENU
+================================ */
+
+.return-menu-button {
+    margin-top: 10px;
+
+    padding: 0;
+
+    border: 0;
+
+    background: transparent;
+
+    color:
+        rgba(
+            215,
+            218,
+            220,
+            0.7
+        );
+
+    font: inherit;
+
+    font-size: 15px;
+
+    cursor: pointer;
+
+    transition:
+        color 180ms ease;
+}
+
+
+.return-menu-button:hover,
+.return-menu-button:focus-visible {
+    color: #fff;
+
+    outline: none;
+}
+
+
+
 @media (max-width: 1000px) {
 
     .main-menu {
@@ -1037,6 +1537,43 @@ body {
         font-size: 14px;
     }
 
+
+
+/* Return to Hold mobile */
+
+    .return-hold-panel {
+        margin-top: 24px;
+    }
+
+    .seal-slots {
+        gap: 8px;
+    }
+
+    .seal-slot {
+        width: 40px;
+        height: 44px;
+
+        font-size: 24px;
+    }
+
+    .seal-ledger {
+        width: min(
+            74vw,
+            270px
+        );
+
+        padding:
+            17px
+            18px
+            20px;
+    }
+
+    .seal-key {
+        height: 35px;
+
+        font-size: 19px;
+    }
+
 }
 
 
@@ -1105,6 +1642,24 @@ body {
         letter-spacing: 0.085em;
     }
 
+
+
+/* Return to Hold small mobile */
+
+    .seal-ledger {
+        width: min(
+            72vw,
+            245px
+        );
+    }
+
+    .seal-slot {
+        width: 36px;
+        height: 40px;
+
+        font-size: 21px;
+    }
+
 }
 
 
@@ -1120,6 +1675,17 @@ body {
     .seal-hold-button::before,
     .seal-hold-button::after {
         transition: none;
+    }
+
+
+
+.seal-key,
+    .return-menu-button {
+        transition: none;
+    }
+
+    .seal-slot.is-inscribed {
+        animation: none;
     }
 
 }

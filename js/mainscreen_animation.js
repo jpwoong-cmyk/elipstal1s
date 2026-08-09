@@ -260,6 +260,10 @@ if (menuContent) {
                     showEstablishHold();
                 }
 
+                if (action === "return") {
+                    showReturnHold();
+                }
+
 
                 return;
             }
@@ -271,6 +275,93 @@ if (menuContent) {
                 )
             ) {
                 forgeSeal();
+
+                return;
+            }
+
+
+            const numberKey =
+                event.target.closest(
+                    "[data-seal-number]"
+                );
+
+
+            if (numberKey) {
+
+                if (enteredSeal.length >= 4) {
+                    return;
+                }
+
+                enteredSeal +=
+                    numberKey.dataset.sealNumber;
+
+                numberKey.classList.add(
+                    "is-pressed"
+                );
+
+                window.setTimeout(
+                    () => {
+                        numberKey.classList.remove(
+                            "is-pressed"
+                        );
+                    },
+                    180
+                );
+
+                updateSealSlots();
+
+                return;
+            }
+
+
+            const sealAction =
+                event.target.closest(
+                    "[data-seal-action]"
+                );
+
+
+            if (sealAction) {
+
+                const sealCommand =
+                    sealAction.dataset.sealAction;
+
+
+                if (sealCommand === "erase") {
+
+                    enteredSeal =
+                        enteredSeal.slice(
+                            0,
+                            -1
+                        );
+
+                    updateSealSlots();
+
+                    return;
+                }
+
+
+                if (
+                    sealCommand === "enter" &&
+                    enteredSeal.length === 4
+                ) {
+
+                    attemptReturnToHold();
+
+                    return;
+                }
+
+            }
+
+
+            if (
+                event.target.closest(
+                    "[data-return-main]"
+                )
+            ) {
+
+                enteredSeal = "";
+
+                showMainMenu();
 
                 return;
             }
@@ -430,6 +521,241 @@ function showEstablishHold() {
     requestAnimationFrame(
         () => holdName?.focus()
     );
+
+}
+
+
+/* ========================================
+   RETURN TO HOLD
+======================================== */
+
+let enteredSeal = "";
+
+
+function showReturnHold() {
+
+    enteredSeal = "";
+
+    menuContent.innerHTML = `
+        <div class="return-hold-panel">
+
+            <label
+                class="hold-label"
+                for="returnHoldName"
+            >
+                Hold Name
+            </label>
+
+
+            <input
+                id="returnHoldName"
+                class="hold-name-input"
+                type="text"
+                maxlength="24"
+                autocomplete="off"
+                spellcheck="false"
+                placeholder="Name your Hold"
+            >
+
+
+            <div class="return-seal-title">
+                Seal
+            </div>
+
+
+            <div
+                id="sealSlots"
+                class="seal-slots"
+                aria-label="Four digit Seal"
+            >
+                <div class="seal-slot"></div>
+                <div class="seal-slot"></div>
+                <div class="seal-slot"></div>
+                <div class="seal-slot"></div>
+            </div>
+
+
+            <div class="seal-ledger">
+
+                <div class="seal-ledger-mark">
+                    Mark the Seal borne by your Hold
+                </div>
+
+
+                <div class="seal-keypad">
+
+                    <button type="button" class="seal-key" data-seal-number="1">1</button>
+                    <button type="button" class="seal-key" data-seal-number="2">2</button>
+                    <button type="button" class="seal-key" data-seal-number="3">3</button>
+
+                    <button type="button" class="seal-key" data-seal-number="4">4</button>
+                    <button type="button" class="seal-key" data-seal-number="5">5</button>
+                    <button type="button" class="seal-key" data-seal-number="6">6</button>
+
+                    <button type="button" class="seal-key" data-seal-number="7">7</button>
+                    <button type="button" class="seal-key" data-seal-number="8">8</button>
+                    <button type="button" class="seal-key" data-seal-number="9">9</button>
+
+                    <button
+                        type="button"
+                        class="seal-key seal-key-command"
+                        data-seal-action="erase"
+                        aria-label="Erase last digit"
+                    >
+                        ‹
+                    </button>
+
+                    <button type="button" class="seal-key" data-seal-number="0">0</button>
+
+                    <button
+                        type="button"
+                        id="enterHoldButton"
+                        class="seal-key seal-key-command seal-key-enter"
+                        data-seal-action="enter"
+                        aria-label="Enter Hold"
+                        disabled
+                    >
+                        ›
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="returnHoldMessage"
+                class="return-hold-message"
+                aria-live="polite"
+            ></div>
+
+
+            <button
+                class="return-menu-button"
+                type="button"
+                data-return-main
+            >
+                Return
+            </button>
+
+        </div>
+    `;
+
+
+    const holdName =
+        document.getElementById(
+            "returnHoldName"
+        );
+
+
+    requestAnimationFrame(
+        () => holdName?.focus()
+    );
+
+}
+
+
+function updateSealSlots() {
+
+    const slots =
+        document.querySelectorAll(
+            ".seal-slot"
+        );
+
+
+    slots.forEach(
+        (slot, index) => {
+
+            const digit =
+                enteredSeal[index];
+
+            slot.textContent =
+                digit || "";
+
+            slot.classList.remove(
+                "is-inscribed"
+            );
+
+
+            if (digit) {
+
+                requestAnimationFrame(
+                    () => {
+                        slot.classList.add(
+                            "is-inscribed"
+                        );
+                    }
+                );
+
+            }
+
+        }
+    );
+
+
+    const enterButton =
+        document.getElementById(
+            "enterHoldButton"
+        );
+
+
+    if (enterButton) {
+
+        enterButton.disabled =
+            enteredSeal.length !== 4;
+
+    }
+
+}
+
+
+function attemptReturnToHold() {
+
+    const holdNameInput =
+        document.getElementById(
+            "returnHoldName"
+        );
+
+    const message =
+        document.getElementById(
+            "returnHoldMessage"
+        );
+
+
+    const holdName =
+        holdNameInput.value.trim();
+
+
+    if (!holdName) {
+
+        message.textContent =
+            "Speak the name of your Hold.";
+
+        holdNameInput.focus();
+
+        return;
+    }
+
+
+    if (enteredSeal.length !== 4) {
+
+        message.textContent =
+            "The Seal is incomplete.";
+
+        return;
+    }
+
+
+    message.textContent =
+        "The Seal is complete.";
+
+
+    /*
+     * Later:
+     *
+     * Validate Hold Name + Seal
+     * against the saved Hold record.
+     */
 
 }
 
